@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="42" fill="#1e1e2e"/>
+  <!-- Steam -->
+  <path d="M70,86 C67,76 73,66 70,56" stroke="#cba6f7" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.65"/>
+  <path d="M96,80 C93,70 99,60 96,50" stroke="#cba6f7" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M122,86 C119,76 125,66 122,56" stroke="#cba6f7" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.65"/>
+  <!-- Bowl rim -->
+  <path d="M36,104 A60,14 0 0,0 156,104" stroke="#cba6f7" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- Bowl body -->
+  <path d="M36,104 Q44,154 96,158 Q148,154 156,104" stroke="#cba6f7" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Bowl base -->
+  <ellipse cx="96" cy="158" rx="17" ry="4" fill="#cba6f7" opacity="0.35"/>
+  <!-- 담다 label -->
+  <text x="96" y="182" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="18" font-weight="700" fill="#cba6f7" opacity="0.9">담다</text>
+</svg>

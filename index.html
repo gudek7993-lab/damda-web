@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e1e2e">
+<title>Damda</title>
+<link rel="manifest" href="manifest.json">
+<script src="config.js" onerror="void 0"></script>
+<style>
+:root{--bg:#1e1e2e;--sf:#2a2a3e;--sf2:#313244;--bd:#45475a;--tx:#cdd6f4;--fa:#a6adc8;--ac:#cba6f7;--gr:#a6e3a1;--re:#f38ba8;--yw:#f9e2af;--bl:#89b4fa;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,'Noto Sans KR',sans-serif;font-size:15px;overflow:hidden}
+.screen{position:fixed;inset:0;overflow-y:auto;display:none;padding-bottom:70px}
+.screen.on{display:block}
+.overlay{position:fixed;inset:0;background:var(--bg);overflow-y:auto;display:none;z-index:20;padding-bottom:80px}
+.overlay.on{display:block}
+.hd{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--sf2)}
+.hd h1{font-size:19px;font-weight:700}
+.hd-space{flex:1}
+.hd-btn{background:none;border:none;color:var(--fa);font-size:22px;cursor:pointer;padding:4px 6px;line-height:1}
+.hd-btn.accent{color:var(--ac)}
+.hd-btn.danger{color:var(--re)}
+#fab{position:fixed;right:20px;bottom:74px;z-index:15;width:56px;height:56px;border-radius:50%;background:var(--ac);color:var(--bg);border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(203,166,247,.4);display:flex;align-items:center;justify-content:center}
+#bot-nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--sf);display:flex;border-top:1px solid var(--sf2);height:54px}
+#bot-nav button{flex:1;background:none;border:none;color:var(--fa);font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#bot-nav button.on{color:var(--ac)}
+#bot-nav svg{width:20px;height:20px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;padding:12px}
+.card{background:var(--sf);border-radius:var(--r);padding:14px;cursor:pointer;active:opacity:.8}
+.card-title{font-weight:600;margin-bottom:4px;font-size:15px}
+.card-sub{font-size:12px;color:var(--fa)}
+.empty-state{text-align:center;padding:80px 20px;color:var(--fa)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.section{padding:12px 16px}
+.section+.section{padding-top:0}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+label{font-size:13px;color:var(--fa);font-weight:500}
+input,textarea,select{background:var(--sf2);color:var(--tx);border:1.5px solid var(--bd);border-radius:8px;padding:10px 12px;font-size:15px;width:100%;outline:none;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--ac)}
+textarea{resize:vertical;min-height:120px}
+select option{background:var(--sf2)}
+.btn{padding:12px 20px;border-radius:8px;border:none;cursor:pointer;font-size:15px;font-weight:600;font-family:inherit;width:100%}
+.btn+.btn{margin-top:8px}
+.btn-primary{background:var(--ac);color:var(--bg)}
+.btn-ghost{background:var(--sf2);color:var(--tx)}
+.btn-danger{background:var(--re);color:#fff}
+.pills{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px 4px}
+.pill{padding:6px 14px;border-radius:999px;background:var(--sf);color:var(--fa);font-size:13px;cursor:pointer;border:none;font-family:inherit}
+.pill.on{background:var(--ac);color:var(--bg);font-weight:600}
+.dial-row{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}
+.dial-btn{width:38px;height:38px;border-radius:50%;background:var(--sf2);border:none;color:var(--tx);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.dial-val{font-size:26px;font-weight:700;min-width:40px;text-align:center}
+.presets{display:flex;gap:6px;padding:4px 16px 12px;flex-wrap:wrap}
+.preset{padding:5px 12px;border-radius:999px;background:var(--sf2);border:none;color:var(--fa);font-size:13px;cursor:pointer;font-family:inherit}
+.preset.on{background:var(--ac);color:var(--bg)}
+.salt-row{display:flex;align-items:center;gap:10px;padding:0 16px 12px;font-size:13px;color:var(--fa)}
+.salt-row input[type=range]{flex:1;accent-color:var(--ac)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{color:var(--fa);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--sf2)}
+td{padding:8px;border-bottom:1px solid var(--sf2)}
+.step-item{background:var(--sf);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.step-num{font-size:12px;color:var(--fa);margin-bottom:4px}
+.step-desc{line-height:1.65}
+.step-timer{background:var(--sf2);border:none;color:var(--bl);font-size:13px;padding:5px 12px;border-radius:6px;cursor:pointer;margin-top:8px;font-family:inherit}
+.step-timer.running{color:var(--yw)}
+.set-block{background:var(--sf);border-radius:var(--r);padding:14px 16px;margin:0 12px 10px}
+.set-title{font-size:13px;color:var(--fa);margin-bottom:8px}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bd);color:var(--tx);padding:10px 20px;border-radius:999px;font-size:14px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+.spinner{display:inline-block;width:22px;height:22px;border:3px solid var(--sf2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-box{text-align:center;padding:60px 20px;color:var(--fa);display:flex;flex-direction:column;align-items:center;gap:14px}
+.err-box{background:#3d1a1f;border:1px solid var(--re);border-radius:var(--r);padding:14px 16px;margin:12px 16px;color:var(--re);font-size:14px;white-space:pre-wrap;line-height:1.5}
+.ing-cls{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--sf2);color:var(--fa)}
+.ing-cls.linear{color:var(--gr)}
+.ing-cls.damped{color:var(--yw)}
+.ing-cls.liquid{color:var(--bl)}
+.ing-cls.salt{color:var(--re)}
+.ing-cls.fixed{color:var(--fa)}
+.review-ing-row{display:grid;grid-template-columns:1fr 70px 60px 80px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.review-ing-row input,
+.review-ing-row select{padding:6px 8px;font-size:13px}
+.review-steps-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.review-steps-row textarea{font-size:13px;min-height:60px;padding:6px 8px}
+.step-title-input{font-size:13px;padding:6px 8px;margin-bottom:4px}
+details summary{cursor:pointer;list-style:none;color:var(--fa);font-size:13px;padding:10px 0}
+details summary::-webkit-details-marker{display:none}
+</style>
+</head>
+<body>
+
+<!-- LIST SCREEN -->
+<div id="s-list" class="screen on">
+  <div class="hd">
+    <h1>Damda <span style="font-size:10px;font-weight:400;color:var(--bd);vertical-align:middle">v4</span></h1>
+    <div class="hd-space"></div>
+    <input id="search-input" type="search" placeholder="검색…" style="width:150px;padding:7px 10px;font-size:13px">
+  </div>
+  <div class="pills" id="filter-pills"></div>
+  <div id="recipe-grid" class="card-grid"></div>
+  <div id="list-empty" class="empty-state" style="display:none">
+    <div class="empty-icon">🍽️</div>
+    <div>레시피가 없습니다<br><small style="color:var(--fa)">+ 버튼으로 추가하세요</small></div>
+  </div>
+</div>
+
+<!-- SETTINGS SCREEN -->
+<div id="s-settings" class="screen">
+  <div class="hd"><h1>설정</h1><div class="hd-space"></div><span style="font-size:11px;color:var(--bd)">Damda v4</span></div>
+  <div id="settings-body"></div>
+</div>
+
+<!-- DETAIL OVERLAY -->
+<div id="s-detail" class="overlay">
+  <div class="hd">
+    <button class="hd-btn" id="detail-back">←</button>
+    <h1 id="detail-title" style="font-size:17px;flex:1"></h1>
+    <button class="hd-btn accent" id="detail-edit">✏️</button>
+    <button class="hd-btn danger" id="detail-delete">🗑</button>
+  </div>
+  <div id="detail-body"></div>
+</div>
+
+<!-- IMPORT OVERLAY -->
+<div id="s-import" class="overlay">
+  <div class="hd">
+    <button class="hd-btn" id="import-back">←</button>
+    <h1 id="import-title">레시피 가져오기</h1>
+  </div>
+  <div id="import-body"></div>
+</div>
+
+<button id="fab" aria-label="추가">+</button>
+
+<nav id="bot-nav">
+  <button id="nav-list" class="on" onclick="showTab('list')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    목록
+  </button>
+  <button id="nav-settings" onclick="showTab('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 00 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    설정
+  </button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ── CONSTANTS ────────────────────────────────────────────────
+const DENS = {
+  '물':1,'육수':1,'다시':1,'면수':1,'국물':1,'스톡':1,
+  '진간장':1.19,'국간장':1.1,'간장':1.19,
+  '멸치액젓':1.1,'액젓':1.1,'참치액':1.1,
+  '고추장':1.15,'된장':1.1,'쌈장':1.1,
+  '굴소스':1.3,
+  '고운소금':1.2,'굵은소금':0.67,'천일염':0.67,'소금':1.2,
+  '식초':1.0,'미림':1.1,'청주':1.0,'맛술':1.1,'술':0.8,
+  '참기름':0.92,'들기름':0.92,'올리브유':0.91,'식용유':0.91,'기름':0.91,
+  '꿀':1.4,'물엿':1.4,'조청':1.35,
+  '설탕':0.85,'우유':1.03,'생크림':1.0,
+  '밀가루':0.56,'전분':0.65,'녹말':0.65,'빵가루':0.2,
+  '고춧가루':0.3,'후춧가루':0.4,'카레가루':0.4,
+};
+const SALTF = {
+  '고운소금':1,'굵은소금':1,'천일염':1,'소금':1,
+  '진간장':0.16,'국간장':0.18,'간장':0.16,
+  '멸치액젓':0.24,'액젓':0.24,'참치액':0.14,
+  '된장':0.12,'고추장':0.07,'쌈장':0.1,
+  '굴소스':0.14,
+};
+const COUNT_UNITS = new Set(['개','쪽','대','줄','장','알','포기','마리','꼬집','통','봉','묶음','병','줄기','뿌리']);
+const ALL_UNITS = ['g','kg','ml','L','T','t','컵','개','쪽','대','장','알','포기','마리','꼬집','통','봉','병','줄기','뿌리'];
+const ALL_CLS   = ['linear','damped','liquid','salt','fixed'];
+
+// ── LOOKUP (longest key first) ───────────────────────────────
+function lookupKey(table, name) {
+  return Object.keys(table).sort((a,b)=>b.length-a.length).find(k=>name.includes(k));
+}
+function densOf(n){ const k=lookupKey(DENS,n); return k?DENS[k]:1; }
+function saltFOf(n){ const k=lookupKey(SALTF,n); return k?SALTF[k]:null; }
+
+// ── UNIT → GRAMS ─────────────────────────────────────────────
+function grams(amt,unit,name){
+  if(COUNT_UNITS.has(unit)) return null;
+  if(unit==='g') return amt;
+  if(unit==='kg') return amt*1000;
+  const ml = unit==='T'?amt*15:unit==='t'?amt*5:unit==='컵'?amt*200:unit==='L'?amt*1000:unit==='ml'?amt:null;
+  return ml!==null ? ml*densOf(name) : null;
+}
+
+// ── SALINITY ─────────────────────────────────────────────────
+function calcSalinity(ings){
+  let sG=0,lG=0;
+  for(const i of ings){
+    const g=grams(i.a,i.u,i.n); if(g==null) continue;
+    const sf=saltFOf(i.n); if(sf) sG+=g*sf;
+    if(i.c==='liquid'||i.c==='salt') lG+=g;
+  }
+  return lG>0?sG/lG*100:0;
+}
+
+// ── SCALING ──────────────────────────────────────────────────
+function scaleCoef(cls,n,baseSalt,targetSalt,hasLiq){
+  if(cls==='fixed') return 1;
+  if(cls==='linear') return n;
+  if(cls==='damped') return Math.pow(n,0.85);
+  if(cls==='liquid') return Math.pow(n,0.92);
+  if(cls==='salt'){
+    if(!baseSalt||baseSalt<=0) return hasLiq?Math.pow(n,0.92):n; // baseSalt=0 방어
+    return (hasLiq?Math.pow(n,0.92):n)*(targetSalt/baseSalt);
+  }
+  return n;
+}
+function scaleAmt(ing,n,baseSalt,targetSalt,hasLiq){
+  if(COUNT_UNITS.has(ing.u)){
+    const f=ing.c==='fixed'?1:ing.c==='damped'?Math.pow(n,0.85):n;
+    return ing.a*f;
+  }
+  return ing.a*scaleCoef(ing.c,n,baseSalt,targetSalt,hasLiq);
+}
+function round(x){
+  if(x>=100) return Math.round(x);
+  if(x>=10) return Math.round(x*10)/10;
+  return Math.round(x*100)/100;
+}
+function fmtAmt(val,unit){
+  if(!isFinite(val)||isNaN(val)) return '적당량';
+  if(val===0) return '소량';
+  if(unit==='g'&&val>=1000) return round(val/1000)+'kg';
+  if(unit==='ml'&&val>=1000) return round(val/1000)+'L';
+  return round(val)+unit;
+}
+
+// ── AUTO-CLASSIFY ────────────────────────────────────────────
+function autoClass(name){
+  if(/물|육수|다시|면수|국물|스톡/.test(name)) return 'liquid';
+  if(/소금|간장|액젓|참치액|된장|고추장|굴소스|쌈장/.test(name)) return 'salt';
+  if(/마늘|생강|후추|고춧가루|파|고추|허브|술|청주|미림|맛술|식초|기름|참기름|들기름|참깨|깨/.test(name)) return 'damped';
+  return 'linear';
+}
+
+// ── DATABASE ─────────────────────────────────────────────────
+let _db;
+function getDB(){
+  if(_db) return Promise.resolve(_db);
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('damda',1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore('recipes',{keyPath:'id'});
+    r.onsuccess=e=>{_db=e.target.result;res(_db);};
+    r.onerror=()=>rej(r.error);
+  });
+}
+async function dbAll(){ const db=await getDB(); return new Promise((r,j)=>{ const q=db.transaction('recipes','readonly').objectStore('recipes').getAll(); q.onsuccess=()=>r(q.result); q.onerror=()=>j(q.error); }); }
+async function dbGet(id){ const db=await getDB(); return new Promise((r,j)=>{ const q=db.transaction('recipes','readonly').objectStore('recipes').get(id); q.onsuccess=()=>r(q.result); q.onerror=()=>j(q.error); }); }
+async function dbPut(rec){ const db=await getDB(); return new Promise((r,j)=>{ const q=db.transaction('recipes','readwrite').objectStore('recipes').put(rec); q.onsuccess=()=>r(); q.onerror=()=>j(q.error); }); }
+async function dbDel(id){ const db=await getDB(); return new Promise((r,j)=>{ const q=db.transaction('recipes','readwrite').objectStore('recipes').delete(id); q.onsuccess=()=>r(); q.onerror=()=>j(q.error); }); }
+
+// ── TOAST ────────────────────────────────────────────────────
+let _toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ── NAV ──────────────────────────────────────────────────────
+function showTab(tab){
+  ['list','settings'].forEach(t=>{
+    document.getElementById('s-'+t).classList.toggle('on',t===tab);
+    document.getElementById('nav-'+t).classList.toggle('on',t===tab);
+  });
+  if(tab==='list') renderList();
+  if(tab==='settings') renderSettings();
+}
+
+// ── GEMINI ───────────────────────────────────────────────────
+function getKey(){ return window.DAMDA_CONFIG?.geminiKey||localStorage.getItem('gemini-key')||''; }
+
+async function geminiCall(parts){
+  const key=getKey();
+  if(!key||key==='YOUR_GEMINI_KEY_HERE') throw new Error('Gemini API 키가 없습니다.\n설정에서 API 키를 입력해 주세요.');
+  const isVideo=parts.some(p=>p.fileData);
+  console.log('[Gemini] 요청 시작', isVideo?'(영상 모드)':'(텍스트 모드)');
+  const res=await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key='+key,
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})}
+  );
+  if(!res.ok){
+    const e=await res.json().catch(()=>({}));
+    console.error('[Gemini] 오류', res.status, e?.error?.message);
+    throw new Error(e?.error?.message||'Gemini 오류 '+res.status);
+  }
+  const data=await res.json();
+  const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  console.log('[Gemini] 응답', text.slice(0,200)+'…');
+  if(!text) throw new Error('Gemini 응답이 비어 있습니다.');
+  return text;
+}
+
+function extractJSON(text){
+  const m=text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  try{ return JSON.parse(m?m[1].trim():text.trim()); }
+  catch(e){ throw new Error('JSON 파싱 실패:\n'+text.slice(0,200)); }
+}
+
+const SCHEMA=`JSON 코드블록으로만 응답. 레시피가 여러 개면 모두 추출:
+\`\`\`json
+{
+  "recipes": [
+    {
+      "title":"요리명",
+      "cuisine":"한식|중식|일식|양식|동남아식|기타 중 하나",
+      "servings":인분(정수),
+      "dish":"국|탕|찌개|전골|조림|볶음|구이|무침|나물|샐러드|튀김|찜|면|밥|죽|기타 중 하나",
+      "source":"출처/채널명",
+      "ings":[{"n":"재료명","a":숫자,"u":"단위","c":"분류"}],
+      "steps":[{"t":"단계명","d":"설명","m":타이머분}],
+      "memo":""
+    }
+  ]
+}
+\`\`\`
+레시피가 1개여도 반드시 recipes 배열로 감싸서 반환.
+단위: g kg ml L T(큰술=15ml) t(작은술=5ml) 컵(200ml) 병(750ml와인/소주는 병) 개 쪽 대 장 알 포기 마리 꼬집 통 봉 줄기 뿌리
+분류: linear(주재료-고기/채소/면/두부) damped(향신료-마늘/생강/기름/술/식초) liquid(물/육수/다시물) salt(소금/간장/액젓/된장/고추장/굴소스) fixed(인분무관)
+타이머: 조리 시간(분), 없으면 0
+중요 규칙:
+- a는 반드시 숫자. 적당량/약간/조금은 소량이면 a:1 u:t, 아예 모르면 a:0
+- 병/캔 단위는 u:"병" u:"통" 으로. 1병=750ml로 ml 변환하지 말것
+- 총 분량 기준으로 기재 (1인분이 아닌 recipe.servings 전체 기준)
+- kg는 kg로, 1.5kg → a:1.5 u:kg (g로 변환하지 말것)
+- 주재료(고기/생선) 양은 특히 정확히. 영상에서 저울/포장지에 표시된 숫자 우선
+- servings는 영상에서 명시한 인분 수. 불명확하면 재료 총량으로 추정
+- 영상 설명란 텍스트가 제공된 경우 재료 분량은 그 값을 최우선으로 사용`;
+
+// YouTube URL → { id, isShorts }
+function extractVideoId(url){
+  const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+function isYouTubeShorts(url){
+  return /youtube\.com\/shorts\//.test(url);
+}
+
+// ── NORMALIZE parse result → always Recipe[] ─────────────────
+function normalizeRecipes(result){
+  if(Array.isArray(result)) return result;
+  if(Array.isArray(result?.recipes)) return result.recipes;
+  return [result]; // 구형 단일 객체 호환
+}
+
+// ── PARSE FROM TEXT ───────────────────────────────────────────
+async function parseFromText(raw){
+  const text=raw.slice(0,8000);
+  const r=await geminiCall([{text:'다음 요리 자막에서 레시피를 모두 추출해.\n\n자막:\n'+text+'\n\n'+SCHEMA}]);
+  return normalizeRecipes(extractJSON(r));
+}
+
+// ── PARSE FROM YOUTUBE VIDEO ──────────────────────────────────
+async function parseFromVideo(videoId, extraDesc='', isShorts=false){
+  console.log('[YouTube] 영상 분석 시작 videoId='+videoId+(isShorts?' (Shorts)':''));
+  const fileUri=isShorts
+    ?'https://www.youtube.com/shorts/'+videoId
+    :'https://www.youtube.com/watch?v='+videoId;
+  const filePart={fileData:{mimeType:'video/*',fileUri}};
+  const descNote=extraDesc
+    ? '\n\n아래는 영상 설명/댓글 텍스트입니다. 여러 요리가 있으면 각각 별도 레시피로 추출하고, 재료 분량은 이 텍스트의 값을 최우선으로 사용하세요:\n"""\n'+extraDesc+'\n"""'
+    : '\n\n영상에 메인 요리 외 곁들임 요리(side dish), 소스, 퓨레, 가니쉬 등이 별도로 나오면 각각 별도 레시피로 추출해.';
+  const textPart={text:'이 요리 영상에서 나오는 레시피를 모두 추출해.'+descNote+'\n\n'+SCHEMA};
+  const r=await geminiCall([filePart,textPart]);
+  const recipes=normalizeRecipes(extractJSON(r));
+  console.log('[YouTube] 파싱 완료', recipes.map(r=>r.title).join(', '));
+  return recipes;
+}
+
+// ── LIST SCREEN ───────────────────────────────────────────────
+let allRecipes=[];
+let activeFilter='전체';
+let searchQuery='';
+
+async function renderList(){
+  allRecipes=await dbAll();
+  allRecipes.sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
+
+  // filter pills
+  const cuisines=['전체',...new Set(allRecipes.map(r=>r.cuisine).filter(Boolean))];
+  const pillsEl=document.getElementById('filter-pills');
+  pillsEl.innerHTML='';
+  cuisines.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='pill'+(c===activeFilter?' on':'');
+    btn.textContent=c;
+    btn.onclick=()=>{ activeFilter=c; renderList(); };
+    pillsEl.appendChild(btn);
+  });
+
+  // filter + search
+  const q=searchQuery.toLowerCase();
+  const shown=allRecipes.filter(r=>{
+    if(activeFilter!=='전체'&&r.cuisine!==activeFilter) return false;
+    if(q&&!r.title?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const grid=document.getElementById('recipe-grid');
+  const empty=document.getElementById('list-empty');
+  if(!shown.length){ grid.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  grid.innerHTML='';
+  shown.forEach(r=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML='<div class="card-title">'+esc(r.title||'제목없음')+'</div>'
+      +(r.source?'<div class="card-sub" style="color:var(--ac);margin-bottom:3px">'+esc(r.source)+'</div>':'')
+      +'<div class="card-sub">'+esc(r.cuisine||'')+(r.dish?' · '+esc(r.dish):'')+'</div>'
+      +'<div class="card-sub" style="margin-top:2px">'+esc(r.servings||'')+'인분</div>';
+    card.onclick=()=>openDetail(r.id);
+    grid.appendChild(card);
+  });
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── DETAIL SCREEN ─────────────────────────────────────────────
+let detailId=null;
+let detailServings=2;
+let detailTargetSalt=null;
+let timerIntervals={};
+
+function openDetail(id){
+  detailId=id;
+  document.getElementById('s-detail').classList.add('on');
+  loadDetail();
+}
+function closeDetail(){
+  document.getElementById('s-detail').classList.remove('on');
+  Object.values(timerIntervals).forEach(clearInterval);
+  timerIntervals={};
+  detailId=null;
+}
+
+async function loadDetail(){
+  const r=await dbGet(detailId);
+  if(!r){ closeDetail(); return; }
+  detailServings=r.servings||2;
+  const baseSalt=calcSalinity(r.ings||[]);
+  detailTargetSalt=baseSalt||1.0;
+  document.getElementById('detail-title').textContent=r.title||'';
+  renderDetail(r,baseSalt);
+}
+
+function renderDetail(r,baseSalt){
+  const n=detailServings/(r.servings||1);
+  const tSalt=detailTargetSalt;
+  const hasLiq=(r.ings||[]).some(i=>i.c==='liquid');
+  const hasSalt=(r.ings||[]).some(i=>i.c==='salt');
+  const body=document.getElementById('detail-body');
+
+  let html='';
+
+  // Servings dial
+  html+='<div class="dial-row">'
+    +'<button class="dial-btn" id="dial-minus">−</button>'
+    +'<span class="dial-val" id="dial-val">'+detailServings+'</span>'
+    +'<span style="color:var(--fa);font-size:14px">인분</span>'
+    +'<button class="dial-btn" id="dial-plus">+</button>'
+    +'</div>'
+    +'<div class="presets">';
+  [1,2,4,6,8].forEach(p=>{
+    html+='<button class="preset'+(detailServings===p?' on':'')+'" data-p="'+p+'">'+p+'인</button>';
+  });
+  html+='</div>';
+
+  // Salt slider
+  if(hasSalt&&baseSalt>0){
+    html+='<div class="salt-row">'
+      +'<span>간</span>'
+      +'<input type="range" id="salt-slider" min="0.5" max="3.0" step="0.05" value="'+tSalt.toFixed(2)+'">'
+      +'<span id="salt-val">'+tSalt.toFixed(1)+'%</span>'
+      +'</div>';
+  }
+
+  // Source/meta
+  if(r.source){
+    html+='<div style="padding:6px 16px 12px;font-size:13px;color:var(--ac)">📺 '+esc(r.source)+'</div>';
+  }
+
+  // Ingredients
+  html+='<div class="section"><h2 style="font-size:14px;color:var(--fa);margin-bottom:8px">재료</h2>'
+    +'<table><thead><tr><th>재료</th><th>양</th><th></th></tr></thead><tbody>';
+  (r.ings||[]).forEach(ing=>{
+    const scaled=scaleAmt(ing,n,baseSalt,tSalt,hasLiq);
+    html+='<tr>'
+      +'<td>'+esc(ing.n)+'</td>'
+      +'<td>'+fmtAmt(scaled,ing.u)+'</td>'
+      +'<td><span class="ing-cls '+esc(ing.c)+'">'+esc(ing.c)+'</span></td>'
+      +'</tr>';
+  });
+  html+='</tbody></table></div>';
+
+  // Steps
+  html+='<div class="section"><h2 style="font-size:14px;color:var(--fa);margin-bottom:8px">조리 순서</h2>';
+  (r.steps||[]).forEach((step,i)=>{
+    const desc=formatStepDesc(step.d||'',r.ings||[],ing=>fmtAmt(scaleAmt(ing,n,baseSalt,tSalt,hasLiq),ing.u));
+    html+='<div class="step-item">'
+      +'<div class="step-num">'+( i+1)+'단계'+(step.t?' — '+esc(step.t):'')+'</div>'
+      +'<div class="step-desc">'+desc+'</div>';
+    if(step.m>0){
+      html+='<button class="step-timer" data-min="'+step.m+'" data-idx="'+i+'" id="timer-btn-'+i+'">⏱ '+step.m+'분</button>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+
+  if(r.memo){ html+='<div class="section" style="font-size:13px;color:var(--fa)">'+esc(r.memo)+'</div>'; }
+
+  body.innerHTML=html;
+
+  // attach events
+  document.getElementById('dial-minus').onclick=()=>changeSrv(-1,r,baseSalt);
+  document.getElementById('dial-plus').onclick=()=>changeSrv(1,r,baseSalt);
+  body.querySelectorAll('.preset').forEach(btn=>{
+    btn.onclick=()=>{ detailServings=parseInt(btn.dataset.p); renderDetail(r,baseSalt); };
+  });
+  const slider=document.getElementById('salt-slider');
+  if(slider){
+    slider.oninput=()=>{
+      detailTargetSalt=parseFloat(slider.value);
+      document.getElementById('salt-val').textContent=detailTargetSalt.toFixed(1)+'%';
+      renderDetail(r,baseSalt);
+    };
+  }
+  body.querySelectorAll('.step-timer').forEach(btn=>{
+    btn.onclick=()=>startTimer(btn,parseInt(btn.dataset.min),parseInt(btn.dataset.idx));
+  });
+
+  // Wake Lock
+  if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(()=>{});
+}
+
+function changeSrv(delta,r,baseSalt){
+  detailServings=Math.max(1,detailServings+delta);
+  renderDetail(r,baseSalt);
+}
+
+function formatStepDesc(desc,ings,fmtFn){
+  return esc(desc).replace(/\{([^}]+)\}/g,(m,name)=>{
+    const ing=ings.find(i=>i.n===name);
+    return ing?('<strong style="color:var(--ac)">'+esc(name)+' '+fmtFn(ing)+'</strong>'):esc(name);
+  });
+}
+
+function startTimer(btn,minutes,idx){
+  if(timerIntervals[idx]){ clearInterval(timerIntervals[idx]); delete timerIntervals[idx]; btn.textContent='⏱ '+minutes+'분'; btn.classList.remove('running'); return; }
+  let secs=minutes*60;
+  btn.classList.add('running');
+  const tick=()=>{
+    secs--;
+    if(secs<=0){ clearInterval(timerIntervals[idx]); delete timerIntervals[idx]; btn.textContent='✅ 완료!'; btn.classList.remove('running'); return; }
+    const m=Math.floor(secs/60),s=secs%60;
+    btn.textContent=(m?m+'분 ':'')+(s<10?'0':'')+s+'초';
+  };
+  tick();
+  timerIntervals[idx]=setInterval(tick,1000);
+}
+
+// ── IMPORT ───────────────────────────────────────────────────
+function openImport(){
+  document.getElementById('import-title').textContent='레시피 가져오기';
+  document.getElementById('s-import').classList.add('on');
+  renderImportStep1();
+}
+function closeImport(){
+  document.getElementById('s-import').classList.remove('on');
+}
+
+function renderImportStep1(){
+  const body=document.getElementById('import-body');
+  body.innerHTML=
+    '<div class="section">'
+    +'<div class="field">'
+    +'<label>YouTube URL</label>'
+    +'<input id="yt-url" type="url" placeholder="https://youtu.be/…">'
+    +'</div>'
+    +'<div class="field">'
+    +'<label>영상 설명 (선택 — 있으면 정확도 높아짐)</label>'
+    +'<div style="font-size:12px;color:var(--fa);margin-bottom:6px">YouTube 설명란에 재료/분량이 있으면 복사해서 붙여넣으세요</div>'
+    +'<textarea id="yt-desc" placeholder="재료: 소 갈비살 1.5kg, 레드 와인 1병…" style="min-height:80px"></textarea>'
+    +'</div>'
+    +'<button class="btn btn-primary" id="btn-parse-url">Gemini로 영상 분석</button>'
+    +'<div style="font-size:12px;color:var(--fa);margin-top:8px">Gemini가 영상을 직접 보고 레시피를 추출합니다.</div>'
+    +'</div>'
+    +'<div class="section">'
+    +'<details>'
+    +'<summary>▸ 자막 텍스트 직접 붙여넣기</summary>'
+    +'<div class="field" style="margin-top:10px">'
+    +'<div style="font-size:12px;color:var(--fa);margin-bottom:6px">YouTube 영상 → … → 스크립트 보기 → 전체 복사</div>'
+    +'<textarea id="paste-input" placeholder="자막을 붙여넣으세요…" style="min-height:160px"></textarea>'
+    +'</div>'
+    +'<button class="btn btn-ghost" id="btn-parse-text">Gemini로 파싱</button>'
+    +'</details>'
+    +'</div>';
+
+  document.getElementById('btn-parse-url').onclick=async()=>{
+    const url=document.getElementById('yt-url').value.trim();
+    const vid=extractVideoId(url);
+    if(!vid){ toast('올바른 YouTube URL을 입력하세요'); return; }
+    const shorts=isYouTubeShorts(url);
+    let desc=document.getElementById('yt-desc')?.value.trim()||'';
+    let infoMsg=desc?'직접 입력 설명 포함':'';
+    // 설명란이 비어 있으면 서버에서 자동 가져오기 시도
+    if(!desc){
+      document.getElementById('import-body').innerHTML=
+        '<div class="loading-box"><div class="spinner"></div><div>영상 정보 가져오는 중…</div></div>';
+      try{
+        const ctrl=new AbortController();
+        setTimeout(()=>ctrl.abort(),15000);
+        const r=await fetch('/api/info?v='+vid,{signal:ctrl.signal});
+        if(r.ok){
+          const d=await r.json();
+          console.log('[서버] /api/info 응답:', d);
+          const parts=[];
+          if(d.description) parts.push('=== 영상 설명 ===\n'+d.description);
+          if(d.pinned_comments?.length) parts.push('=== 고정/크리에이터 댓글 ===\n'+d.pinned_comments.join('\n---\n'));
+          if(d.top_comments?.length) parts.push('=== 인기 댓글 (참고) ===\n'+d.top_comments.slice(0,5).join('\n---\n'));
+          desc=parts.join('\n\n');
+          const found=[];
+          if(d.description) found.push('설명란 ✓');
+          if(d.pinned_comments?.length) found.push('고정댓글 '+d.pinned_comments.length+'개 ✓');
+          if(d.top_comments?.length) found.push('상위댓글 '+d.top_comments.length+'개 ✓');
+          infoMsg=found.length?found.join(' · '):'설명/댓글 없음 — 영상만 분석';
+          if(desc) console.log('[서버] 설명 포함 ('+desc.length+'자):', desc.slice(0,300));
+          else console.warn('[서버] 설명/댓글 없음 — 영상만 분석');
+        } else {
+          infoMsg='서버 오류 ('+r.status+') — 영상만 분석';
+          console.warn('[서버] /api/info 실패:', r.status);
+        }
+      }catch(e){
+        infoMsg='서버 미실행 — 영상만 분석';
+        console.warn('[서버] 연결 실패:', e.message);
+      }
+    }
+    await runParse(()=>parseFromVideo(vid,desc,shorts), infoMsg);
+  };
+  document.getElementById('btn-parse-text').onclick=async()=>{
+    const raw=document.getElementById('paste-input')?.value.trim();
+    if(!raw){ toast('자막을 붙여넣으세요'); return; }
+    await runParse(()=>parseFromText(raw));
+  };
+}
+
+async function runParse(parseFn, statusMsg=''){
+  const body=document.getElementById('import-body');
+  body.innerHTML='<div class="loading-box"><div class="spinner"></div><div>Gemini가 분석 중…</div>'
+    +(statusMsg?'<div style="font-size:12px;margin-top:6px;color:'+(statusMsg.includes('미실행')||statusMsg.includes('오류')?'var(--yw)':'var(--gr)')+'">'+esc(statusMsg)+'</div>':'')
+    +'</div>';
+  try{
+    const recipes=await parseFn();
+    if(recipes.length>1){
+      renderRecipeSelect(recipes);
+    } else {
+      renderReview(recipes[0]);
+    }
+  }catch(e){
+    body.innerHTML='<div class="err-box">'+esc(e.message)+'</div>'
+      +'<div class="section"><button class="btn btn-ghost" id="btn-retry">← 다시 시도</button></div>';
+    document.getElementById('btn-retry').onclick=renderImportStep1;
+  }
+}
+
+function renderRecipeSelect(recipes){
+  multiRecipes=recipes;
+  multiIdx=null;
+  document.getElementById('import-title').textContent=recipes.length+'개 레시피 감지됨';
+  const body=document.getElementById('import-body');
+  let html='<div class="section">'
+    +'<p style="color:var(--fa);font-size:13px;margin-bottom:14px">'
+    +recipes.length+'개의 레시피를 찾았습니다. 저장할 레시피를 선택하세요.</p>';
+  recipes.forEach((r,i)=>{
+    const saved=r._saved?'<span style="color:var(--gr);font-size:12px;margin-left:8px">✓ 저장됨</span>':'';
+    html+='<div style="background:var(--sf);border-radius:var(--r);padding:14px;margin-bottom:10px">'
+      +'<div style="font-weight:600;margin-bottom:4px">'+esc(r.title||'제목없음')+saved+'</div>'
+      +'<div style="font-size:12px;color:var(--fa);margin-bottom:10px">'
+      +esc(r.cuisine||'')+(r.dish?' · '+esc(r.dish):'')
+      +' · '+esc(r.servings||'?')+'인분'
+      +' · 재료 '+(r.ings?.length||0)+'개'
+      +' · 단계 '+(r.steps?.length||0)+'개'
+      +'</div>'
+      +(r._saved
+        ? '<div style="font-size:13px;color:var(--gr)">저장 완료</div>'
+        : '<button class="btn btn-primary" data-idx="'+i+'" style="padding:9px 16px;font-size:13px">검토 후 저장</button>')
+      +'</div>';
+  });
+  html+='<button class="btn btn-ghost" id="btn-sel-back" style="margin-top:4px">← 다시 가져오기</button></div>';
+  body.innerHTML=html;
+  body.querySelectorAll('[data-idx]').forEach(btn=>{
+    btn.onclick=()=>{
+      multiIdx=parseInt(btn.dataset.idx);
+      renderReview(recipes[multiIdx]);
+      setTimeout(()=>{
+        const c=document.getElementById('btn-cancel');
+        if(c) c.onclick=()=>renderRecipeSelect(recipes);
+      },0);
+    };
+  });
+  document.getElementById('btn-sel-back').onclick=()=>{ multiRecipes=null; multiIdx=null; renderImportStep1(); };
+}
+
+function renderReview(recipe){
+  document.getElementById('import-title').textContent='내용 확인 후 저장';
+  const body=document.getElementById('import-body');
+
+  // build unit options
+  const unitOpts=ALL_UNITS.map(u=>'<option>'+u+'</option>').join('');
+  const clsOpts=ALL_CLS.map(c=>'<option>'+c+'</option>').join('');
+
+  // ingredients rows
+  let ingRows='';
+  (recipe.ings||[]).forEach((ing,i)=>{
+    ingRows+='<div class="review-ing-row">'
+      +'<input class="r-ing-n" data-i="'+i+'" value="'+esc(ing.n||'')+'">'
+      +'<input class="r-ing-a" data-i="'+i+'" type="number" value="'+esc(ing.a||0)+'" step="any">'
+      +'<select class="r-ing-u" data-i="'+i+'">'+ALL_UNITS.map(u=>'<option'+(u===ing.u?' selected':'')+'>'+u+'</option>').join('')+'</select>'
+      +'<select class="r-ing-c" data-i="'+i+'">'+ALL_CLS.map(c=>'<option'+(c===ing.c?' selected':'')+'>'+c+'</option>').join('')+'</select>'
+      +'<button class="hd-btn danger r-ing-del" data-i="'+i+'" style="font-size:16px">×</button>'
+      +'</div>';
+  });
+
+  // step rows
+  let stepRows='';
+  (recipe.steps||[]).forEach((step,i)=>{
+    stepRows+='<div class="review-steps-row" id="step-row-'+i+'">'
+      +'<span style="color:var(--fa);font-size:13px;min-width:20px">'+(i+1)+'</span>'
+      +'<div style="flex:1;display:flex;flex-direction:column;gap:4px">'
+      +'<input class="r-step-t step-title-input" data-i="'+i+'" value="'+esc(step.t||'')+'" placeholder="단계 제목">'
+      +'<textarea class="r-step-d" data-i="'+i+'" rows="2">'+esc(step.d||'')+'</textarea>'
+      +'<input class="r-step-m" data-i="'+i+'" type="number" value="'+esc(step.m||0)+'" placeholder="타이머(분)" style="width:90px;font-size:13px;padding:5px 8px">'
+      +'</div>'
+      +'<button class="hd-btn danger r-step-del" data-i="'+i+'" style="font-size:16px">×</button>'
+      +'</div>';
+  });
+
+  body.innerHTML=
+    '<div class="section">'
+    +'<div class="field"><label>제목</label><input id="r-title" value="'+esc(recipe.title||'')+'"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="field"><label>종류</label>'
+    +'<datalist id="cuisine-list">'+['한식','중식','일식','양식','동남아식','기타','멕시칸','인도식','지중해식','퓨전'].map(c=>'<option value="'+c+'">').join('')+'</datalist>'
+    +'<input id="r-cuisine" list="cuisine-list" value="'+esc(recipe.cuisine||'')+'" placeholder="한식, 양식, 직접입력…"></div>'
+    +'<div class="field"><label>인분</label><input id="r-servings" type="number" value="'+esc(recipe.servings||2)+'"></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="field"><label>요리 분류</label>'
+    +'<select id="r-dish">'+['국','탕','찌개','전골','조림','볶음','구이','무침','나물','샐러드','튀김','찜','면','밥','죽','기타'].map(d=>'<option'+(d===recipe.dish?' selected':'')+'>'+d+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>출처</label><input id="r-source" value="'+esc(recipe.source||'')+'"></div>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="section">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+    +'<h2 style="font-size:14px;color:var(--fa)">재료</h2>'
+    +'<button class="hd-btn accent" id="add-ing">+ 추가</button>'
+    +'</div>'
+    +'<div id="ing-rows">'+ingRows+'</div>'
+    +'</div>'
+
+    +'<div class="section">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+    +'<h2 style="font-size:14px;color:var(--fa)">조리 순서</h2>'
+    +'<button class="hd-btn accent" id="add-step">+ 추가</button>'
+    +'</div>'
+    +'<div id="step-rows">'+stepRows+'</div>'
+    +'</div>'
+
+    +'<div class="section">'
+    +'<div class="field"><label>메모</label><textarea id="r-memo" rows="2">'+esc(recipe.memo||'')+'</textarea></div>'
+    +'<button class="btn btn-primary" id="btn-save">저장</button>'
+    +'<button class="btn btn-ghost" id="btn-cancel" style="margin-top:8px">← 다시 가져오기</button>'
+    +'</div>';
+
+  // Ingredient events
+  document.getElementById('ing-rows').addEventListener('click',e=>{
+    if(e.target.classList.contains('r-ing-del')){
+      e.target.closest('.review-ing-row').remove();
+    }
+  });
+  document.getElementById('add-ing').onclick=()=>{
+    const row=document.createElement('div');
+    row.className='review-ing-row';
+    const newIdx=Date.now();
+    row.innerHTML='<input class="r-ing-n" value="">'
+      +'<input class="r-ing-a" type="number" value="0" step="any">'
+      +'<select class="r-ing-u">'+unitOpts+'</select>'
+      +'<select class="r-ing-c">'+clsOpts+'</select>'
+      +'<button class="hd-btn danger r-ing-del" style="font-size:16px">×</button>';
+    document.getElementById('ing-rows').appendChild(row);
+  };
+
+  // Step events
+  document.getElementById('step-rows').addEventListener('click',e=>{
+    if(e.target.classList.contains('r-step-del')){
+      e.target.closest('.review-steps-row').remove();
+    }
+  });
+  document.getElementById('add-step').onclick=()=>{
+    const row=document.createElement('div');
+    row.className='review-steps-row';
+    row.innerHTML='<span style="color:var(--fa);font-size:13px;min-width:20px">+</span>'
+      +'<div style="flex:1;display:flex;flex-direction:column;gap:4px">'
+      +'<input class="r-step-t step-title-input" value="" placeholder="단계 제목">'
+      +'<textarea class="r-step-d" rows="2"></textarea>'
+      +'<input class="r-step-m" type="number" value="0" placeholder="타이머(분)" style="width:90px;font-size:13px;padding:5px 8px">'
+      +'</div>'
+      +'<button class="hd-btn danger r-step-del" style="font-size:16px">×</button>';
+    document.getElementById('step-rows').appendChild(row);
+  };
+
+  document.getElementById('btn-cancel').onclick=renderImportStep1;
+  document.getElementById('btn-save').onclick=()=>saveReview();
+}
+
+// editingId: 편집 중인 기존 레시피 ID (null이면 신규)
+let editingId=null;
+// 다중 레시피 선택 상태
+let multiRecipes=null;
+let multiIdx=null;
+
+function openEdit(recipe){
+  editingId=recipe.id;
+  document.getElementById('import-title').textContent='레시피 수정';
+  document.getElementById('s-import').classList.add('on');
+  renderReview(recipe);
+}
+
+async function saveReview(){
+  const title=document.getElementById('r-title').value.trim();
+  if(!title){ toast('제목을 입력하세요'); return; }
+
+  const ings=[...document.querySelectorAll('#ing-rows .review-ing-row')].map(row=>({
+    n: row.querySelector('.r-ing-n').value.trim(),
+    a: parseFloat(row.querySelector('.r-ing-a').value)||0,
+    u: row.querySelector('.r-ing-u').value,
+    c: row.querySelector('.r-ing-c').value,
+  })).filter(i=>i.n);
+
+  const steps=[...document.querySelectorAll('#step-rows .review-steps-row')].map(row=>({
+    t: row.querySelector('.r-step-t')?.value.trim()||'',
+    d: row.querySelector('.r-step-d')?.value.trim()||'',
+    m: parseInt(row.querySelector('.r-step-m')?.value)||0,
+  })).filter(s=>s.d);
+
+  const recipe={
+    id: editingId||'r_'+Date.now(),
+    title,
+    cuisine: document.getElementById('r-cuisine').value,
+    servings: parseInt(document.getElementById('r-servings').value)||2,
+    dish: document.getElementById('r-dish').value,
+    source: document.getElementById('r-source').value.trim(),
+    memo: document.getElementById('r-memo').value.trim(),
+    ings, steps,
+    savedAt: Date.now(),
+  };
+
+  await dbPut(recipe);
+  const wasEditing=!!editingId;
+  editingId=null;
+  await renderList();
+  toast(title+(wasEditing?' 수정됨':' 저장됨'));
+
+  // 다중 레시피 선택 중이면 → 선택 화면으로 복귀
+  if(multiRecipes&&multiIdx!==null){
+    multiRecipes[multiIdx]._saved=true;
+    const remaining=multiRecipes.filter(r=>!r._saved);
+    if(remaining.length>0){
+      renderRecipeSelect(multiRecipes);
+      return;
+    } else {
+      multiRecipes=null; multiIdx=null;
+      closeImport();
+      return;
+    }
+  }
+
+  if(wasEditing&&detailId) await loadDetail();
+  closeImport();
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function renderSettings(){
+  const key=localStorage.getItem('gemini-key')||'';
+  const hasConfig=window.DAMDA_CONFIG?.geminiKey&&window.DAMDA_CONFIG.geminiKey!=='YOUR_GEMINI_KEY_HERE';
+  const body=document.getElementById('settings-body');
+
+  body.innerHTML=
+    '<div class="set-block">'
+    +'<div class="set-title">Gemini API 키</div>'
+    +(hasConfig?'<div style="font-size:13px;color:var(--gr)">config.js에서 로드됨 ✓</div>':'')
+    +'<input id="key-input" type="password" placeholder="AIza…" value="'+esc(key)+'" style="margin-top:8px">'
+    +'<button class="btn btn-ghost" id="btn-save-key" style="margin-top:8px">저장</button>'
+    +'</div>'
+
+    +'<div class="set-block">'
+    +'<div class="set-title">데이터 내보내기 / 가져오기</div>'
+    +'<button class="btn btn-ghost" id="btn-export">JSON 내보내기</button>'
+    +'<label class="btn btn-ghost" style="margin-top:8px;text-align:center;cursor:pointer">'
+    +'JSON 가져오기<input type="file" id="file-import" accept=".json" style="display:none">'
+    +'</label>'
+    +'</div>'
+
+    +'<div class="set-block">'
+    +'<div class="set-title">데이터 초기화</div>'
+    +'<button class="btn btn-danger" id="btn-clear">모든 레시피 삭제</button>'
+    +'</div>'
+
+    +'<div class="set-block">'
+    +'<details>'
+    +'<summary style="font-weight:600;color:var(--tx)">인분 계산 방식</summary>'
+    +'<div style="margin-top:12px;font-size:13px;line-height:1.8;color:var(--fa)">'
+    +'<p style="margin-bottom:10px">재료를 단순히 인분 배율로 곱하면 틀립니다. 재료 성격에 따라 다르게 계산합니다.</p>'
+    +'<table style="width:100%;font-size:12px;border-collapse:collapse">'
+    +'<tr style="border-bottom:1px solid var(--sf2)"><th style="padding:6px 4px;text-align:left;color:var(--tx)">분류</th><th style="padding:6px 4px;text-align:left;color:var(--tx)">공식</th><th style="padding:6px 4px;text-align:left;color:var(--tx)">해당 재료</th></tr>'
+    +'<tr style="border-bottom:1px solid var(--sf2)"><td style="padding:6px 4px;color:var(--gr)">linear</td><td style="padding:6px 4px">× n</td><td style="padding:6px 4px">고기, 채소, 면, 곡물</td></tr>'
+    +'<tr style="border-bottom:1px solid var(--sf2)"><td style="padding:6px 4px;color:var(--yw)">damped</td><td style="padding:6px 4px">× n⁰·⁸⁵</td><td style="padding:6px 4px">마늘, 생강, 기름, 향신료, 술</td></tr>'
+    +'<tr style="border-bottom:1px solid var(--sf2)"><td style="padding:6px 4px;color:var(--bl)">liquid</td><td style="padding:6px 4px">× n⁰·⁹²</td><td style="padding:6px 4px">물, 육수, 다시물</td></tr>'
+    +'<tr style="border-bottom:1px solid var(--sf2)"><td style="padding:6px 4px;color:var(--re)">salt</td><td style="padding:6px 4px">× n⁰·⁹² × (목표염도 / 원본염도)</td><td style="padding:6px 4px">소금, 간장, 액젓, 된장, 굴소스</td></tr>'
+    +'<tr><td style="padding:6px 4px;color:var(--fa)">fixed</td><td style="padding:6px 4px">× 1</td><td style="padding:6px 4px">인분과 무관한 고정 재료</td></tr>'
+    +'</table>'
+    +'<p style="margin-top:10px"><b style="color:var(--tx)">왜 liquid가 n⁰·⁹²?</b><br>증발량은 부피가 아니라 표면적×시간에 비례합니다. 큰 냄비는 부피 대비 표면적이 작아 덜 졸아들어, 2배 만들 때 물을 2배 넣으면 싱거워집니다.</p>'
+    +'<p style="margin-top:8px"><b style="color:var(--tx)">왜 damped가 n⁰·⁸⁵?</b><br>향과 자극은 지각이 비선형입니다. 마늘 2배는 2배보다 강하게 느껴집니다.</p>'
+    +'<p style="margin-top:8px"><b style="color:var(--tx)">염도 슬라이더</b><br>간 재료(salt)를 개별로 조절하지 않고 목표 염도(%) 하나만 바꾸면 모든 간 재료가 동시에 재계산됩니다. 염도 = Σ(간 재료g × 소금환산계수) / Σ(국물g) × 100</p>'
+    +'</div>'
+    +'</details>'
+    +'</div>';
+
+  document.getElementById('btn-save-key').onclick=()=>{
+    const k=document.getElementById('key-input').value.trim();
+    if(k) localStorage.setItem('gemini-key',k); else localStorage.removeItem('gemini-key');
+    toast('저장됨');
+  };
+
+  document.getElementById('btn-export').onclick=async()=>{
+    const data=await dbAll();
+    const blob=new Blob([JSON.stringify({version:1,recipes:data},null,2)],{type:'application/json'});
+    const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'damda-recipes.json'});
+    a.click(); URL.revokeObjectURL(a.href);
+    toast(data.length+'개 레시피 내보냄');
+  };
+
+  document.getElementById('file-import').onchange=async(e)=>{
+    const file=e.target.files[0]; if(!file) return;
+    try{
+      const text=await file.text();
+      const data=JSON.parse(text);
+      const recipes=data.recipes||data;
+      if(!Array.isArray(recipes)) throw new Error('올바른 형식이 아닙니다');
+      for(const r of recipes) await dbPut(r);
+      await renderList();
+      toast(recipes.length+'개 가져옴');
+    }catch(err){ toast('가져오기 실패: '+err.message); }
+    e.target.value='';
+  };
+
+  document.getElementById('btn-clear').onclick=async()=>{
+    if(!confirm('모든 레시피를 삭제하시겠습니까?')) return;
+    const all=await dbAll();
+    for(const r of all) await dbDel(r.id);
+    await renderList();
+    toast('삭제됨');
+  };
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+document.getElementById('detail-back').onclick=closeDetail;
+document.getElementById('import-back').onclick=()=>{ editingId=null; closeImport(); };
+document.getElementById('fab').onclick=()=>{ editingId=null; openImport(); };
+document.getElementById('detail-edit').onclick=async()=>{
+  if(!detailId) return;
+  const r=await dbGet(detailId);
+  if(r) openEdit(r);
+};
+document.getElementById('detail-delete').onclick=async()=>{
+  if(!detailId) return;
+  const r=await dbGet(detailId);
+  if(!confirm((r?.title||'이 레시피')+'를 삭제하시겠습니까?')) return;
+  await dbDel(detailId);
+  closeDetail();
+  await renderList();
+  toast('삭제됨');
+};
+document.getElementById('search-input').oninput=e=>{
+  searchQuery=e.target.value;
+  renderList();
+};
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+renderList();
+</script>
+</body>
+</html>

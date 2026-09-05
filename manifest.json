@@ -1,0 +1,13 @@
+{
+  "name": "Damda",
+  "short_name": "Damda",
+  "description": "인분 계산이 되는 개인 레시피 앱",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e1e2e",
+  "theme_color": "#1e1e2e",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
