@@ -486,8 +486,11 @@ function renderDetail(r,baseSalt){
   }
 
   // Source/meta
-  if(r.source){
-    html+='<div style="padding:6px 16px 12px;font-size:13px;color:var(--ac)">📺 '+esc(r.source)+'</div>';
+  if(r.source||r.sourceUrl){
+    html+='<div style="padding:6px 16px 12px;font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+      +(r.source?'<span style="color:var(--ac)">📺 '+esc(r.source)+'</span>':'')
+      +(r.sourceUrl?'<a href="'+esc(r.sourceUrl)+'" target="_blank" rel="noopener" style="background:var(--re);color:#fff;font-size:12px;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:600">▶ 영상 보기</a>':'')
+      +'</div>';
   }
 
   // Ingredients
@@ -645,11 +648,13 @@ function renderImportStep1(){
         console.warn('[서버] 연결 실패:', e.message);
       }
     }
+    currentSourceUrl=url;
     await runParse(()=>parseFromVideo(vid,desc,shorts), infoMsg);
   };
   document.getElementById('btn-parse-text').onclick=async()=>{
     const raw=document.getElementById('paste-input')?.value.trim();
     if(!raw){ toast('자막을 붙여넣으세요'); return; }
+    currentSourceUrl='';
     await runParse(()=>parseFromText(raw));
   };
 }
@@ -759,6 +764,8 @@ function renderReview(recipe){
     +'<select id="r-dish">'+['국','탕','찌개','전골','조림','볶음','구이','무침','나물','샐러드','튀김','찜','면','밥','죽','기타'].map(d=>'<option'+(d===recipe.dish?' selected':'')+'>'+d+'</option>').join('')+'</select></div>'
     +'<div class="field"><label>출처</label><input id="r-source" value="'+esc(recipe.source||'')+'"></div>'
     +'</div>'
+    +'<input id="r-source-url" type="hidden" value="'+esc(recipe.sourceUrl||currentSourceUrl||'')+'">'
+    +((recipe.sourceUrl||currentSourceUrl)?'<div style="padding:0 0 8px;font-size:12px"><a href="'+esc(recipe.sourceUrl||currentSourceUrl)+'" target="_blank" rel="noopener" style="color:var(--bl)">▶ 원본 영상 링크 확인</a></div>':'')
     +'</div>'
 
     +'<div class="section">'
@@ -824,11 +831,10 @@ function renderReview(recipe){
   document.getElementById('btn-save').onclick=()=>saveReview();
 }
 
-// editingId: 편집 중인 기존 레시피 ID (null이면 신규)
 let editingId=null;
-// 다중 레시피 선택 상태
 let multiRecipes=null;
 let multiIdx=null;
+let currentSourceUrl='';
 
 function openEdit(recipe){
   editingId=recipe.id;
@@ -861,6 +867,7 @@ async function saveReview(){
     servings: parseInt(document.getElementById('r-servings').value)||2,
     dish: document.getElementById('r-dish').value,
     source: document.getElementById('r-source').value.trim(),
+    sourceUrl: document.getElementById('r-source-url')?.value||'',
     memo: document.getElementById('r-memo').value.trim(),
     ings, steps,
     savedAt: Date.now(),
