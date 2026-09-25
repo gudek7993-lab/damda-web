@@ -87,6 +87,17 @@ td{padding:8px;border-bottom:1px solid var(--sf2)}
 .step-title-input{font-size:13px;padding:6px 8px;margin-bottom:4px}
 details summary{cursor:pointer;list-style:none;color:var(--fa);font-size:13px;padding:10px 0}
 details summary::-webkit-details-marker{display:none}
+.cook-hd{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 16px;display:flex;align-items:center;border-bottom:1px solid var(--sf2)}
+.cook-prog{flex:1;text-align:center;font-size:14px;color:var(--fa);font-weight:600}
+#cook-close{background:none;border:none;color:var(--fa);font-size:22px;cursor:pointer;padding:4px 8px;line-height:1}
+#cook-body{padding:28px 20px 180px}
+.cook-step-title{font-size:14px;color:var(--fa);margin-bottom:16px;font-weight:500}
+.cook-step-desc{font-size:24px;line-height:1.8;color:var(--tx)}
+.cook-timer-btn{margin-top:24px;width:100%;padding:18px;border-radius:12px;background:var(--sf2);border:none;color:var(--bl);font-size:18px;font-weight:600;cursor:pointer;font-family:inherit}
+.cook-timer-btn.running{color:var(--yw)}
+.cook-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px;background:var(--bg);border-top:1px solid var(--sf2)}
+#cook-prev{padding:18px;font-size:17px;font-weight:700;border-radius:12px;border:none;cursor:pointer;font-family:inherit;background:var(--sf2);color:var(--tx)}
+#cook-next{padding:18px;font-size:17px;font-weight:700;border-radius:12px;border:none;cursor:pointer;font-family:inherit;background:var(--ac);color:var(--bg)}
 </style>
 </head>
 <body>
@@ -94,7 +105,7 @@ details summary::-webkit-details-marker{display:none}
 <!-- LIST SCREEN -->
 <div id="s-list" class="screen on">
   <div class="hd">
-    <h1>Damda <span style="font-size:10px;font-weight:400;color:var(--bd);vertical-align:middle">v5</span></h1>
+    <h1>Damda <span style="font-size:10px;font-weight:400;color:var(--bd);vertical-align:middle">v6</span></h1>
     <div class="hd-space"></div>
     <input id="search-input" type="search" placeholder="검색…" style="width:150px;padding:7px 10px;font-size:13px">
   </div>
@@ -108,7 +119,7 @@ details summary::-webkit-details-marker{display:none}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><div class="hd-space"></div><span style="font-size:11px;color:var(--bd)">Damda v5</span></div>
+  <div class="hd"><h1>설정</h1><div class="hd-space"></div><span style="font-size:11px;color:var(--bd)">Damda v6</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -130,6 +141,20 @@ details summary::-webkit-details-marker{display:none}
     <h1 id="import-title">레시피 가져오기</h1>
   </div>
   <div id="import-body"></div>
+</div>
+
+<!-- COOK OVERLAY -->
+<div id="s-cook" class="overlay">
+  <div class="cook-hd">
+    <button id="cook-close">✕</button>
+    <span class="cook-prog" id="cook-prog"></span>
+    <span style="width:38px"></span>
+  </div>
+  <div id="cook-body"></div>
+  <div class="cook-nav">
+    <button id="cook-prev">← 이전</button>
+    <button id="cook-next">다음 →</button>
+  </div>
 </div>
 
 <button id="fab" aria-label="추가">+</button>
@@ -403,7 +428,11 @@ async function renderList(){
   const q=searchQuery.toLowerCase();
   const shown=allRecipes.filter(r=>{
     if(activeFilter!=='전체'&&r.cuisine!==activeFilter) return false;
-    if(q&&!r.title?.toLowerCase().includes(q)) return false;
+    if(q){
+      const inTitle=r.title?.toLowerCase().includes(q);
+      const inIngs=r.ings?.some(i=>i.n?.toLowerCase().includes(q));
+      if(!inTitle&&!inIngs) return false;
+    }
     return true;
   });
 
@@ -413,12 +442,15 @@ async function renderList(){
   empty.style.display='none';
   grid.innerHTML='';
   shown.forEach(r=>{
+    const inTitle=!q||r.title?.toLowerCase().includes(q);
+    const matchedIng=q&&!inTitle?r.ings?.find(i=>i.n?.toLowerCase().includes(q)):null;
     const card=document.createElement('div');
     card.className='card';
     card.innerHTML='<div class="card-title">'+esc(r.title||'제목없음')+'</div>'
       +(r.source?'<div class="card-sub" style="color:var(--ac);margin-bottom:3px">'+esc(r.source)+'</div>':'')
       +'<div class="card-sub">'+esc(r.cuisine||'')+(r.dish?' · '+esc(r.dish):'')+'</div>'
-      +'<div class="card-sub" style="margin-top:2px">'+esc(r.servings||'')+'인분</div>';
+      +'<div class="card-sub" style="margin-top:2px">'+esc(r.servings||'')+'인분</div>'
+      +(matchedIng?'<div class="card-sub" style="color:var(--yw);margin-top:5px">🥩 재료: '+esc(matchedIng.n)+'</div>':'');
     card.onclick=()=>openDetail(r.id);
     grid.appendChild(card);
   });
@@ -507,7 +539,11 @@ function renderDetail(r,baseSalt){
   html+='</tbody></table></div>';
 
   // Steps
-  html+='<div class="section"><h2 style="font-size:14px;color:var(--fa);margin-bottom:8px">조리 순서</h2>';
+  html+='<div class="section">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+    +'<h2 style="font-size:14px;color:var(--fa)">조리 순서</h2>'
+    +((r.steps||[]).length?'<button id="btn-cook-start" style="background:var(--ac);color:var(--bg);border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">▶ 조리 시작</button>':'')
+    +'</div>';
   (r.steps||[]).forEach((step,i)=>{
     const desc=formatStepDesc(step.d||'',r.ings||[],ing=>fmtAmt(scaleAmt(ing,n,baseSalt,tSalt,hasLiq),ing.u));
     html+='<div class="step-item">'
@@ -542,6 +578,9 @@ function renderDetail(r,baseSalt){
     btn.onclick=()=>startTimer(btn,parseInt(btn.dataset.min),parseInt(btn.dataset.idx));
   });
 
+  const cookBtn=document.getElementById('btn-cook-start');
+  if(cookBtn) cookBtn.onclick=()=>openCook(r,baseSalt);
+
   // Wake Lock
   if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(()=>{});
 }
@@ -570,6 +609,70 @@ function startTimer(btn,minutes,idx){
   };
   tick();
   timerIntervals[idx]=setInterval(tick,1000);
+}
+
+// ── COOK MODE ────────────────────────────────────────────────
+let cookRecipe=null,cookStep=0,cookN=1,cookBaseSalt=0,cookHasLiq=false,cookTSalt=0,cookTimerIv=null;
+
+function openCook(r,baseSalt){
+  cookRecipe=r;
+  cookN=detailServings/(r.servings||1);
+  cookBaseSalt=baseSalt;
+  cookHasLiq=(r.ings||[]).some(i=>i.c==='liquid');
+  cookTSalt=detailTargetSalt||baseSalt||1;
+  if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;}
+  document.getElementById('s-cook').classList.add('on');
+  renderCookStep(0);
+  if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(()=>{});
+}
+
+function closeCook(){
+  document.getElementById('s-cook').classList.remove('on');
+  if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;}
+  cookRecipe=null;
+}
+
+function renderCookStep(idx){
+  if(!cookRecipe) return;
+  const steps=cookRecipe.steps||[];
+  cookStep=Math.max(0,Math.min(idx,steps.length-1));
+  const step=steps[cookStep];
+  const total=steps.length;
+  const isLast=cookStep===total-1;
+  const isFirst=cookStep===0;
+
+  document.getElementById('cook-prog').textContent=(cookStep+1)+' / '+total+' 단계'+(step.t?' — '+esc(step.t):'');
+  const prevBtn=document.getElementById('cook-prev');
+  const nextBtn=document.getElementById('cook-next');
+  prevBtn.disabled=isFirst; prevBtn.style.opacity=isFirst?'0.3':'1';
+  nextBtn.textContent=isLast?'완료 ✓':'다음 →';
+  nextBtn.style.background=isLast?'var(--gr)':'var(--ac)';
+  nextBtn.style.color=isLast?'var(--bg)':'var(--bg)';
+
+  if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;}
+
+  const desc=formatStepDesc(step.d||'',cookRecipe.ings||[],
+    ing=>fmtAmt(scaleAmt(ing,cookN,cookBaseSalt,cookTSalt,cookHasLiq),ing.u));
+
+  let html='<div class="cook-step-desc">'+desc+'</div>';
+  if(step.m>0) html+='<button class="cook-timer-btn" id="cook-tbtn">⏱ '+step.m+'분</button>';
+  document.getElementById('cook-body').innerHTML=html;
+  document.getElementById('s-cook').scrollTo(0,0);
+
+  if(step.m>0){
+    let secs=step.m*60;
+    const tbtn=document.getElementById('cook-tbtn');
+    tbtn.onclick=()=>{
+      if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;tbtn.textContent='⏱ '+step.m+'분';tbtn.classList.remove('running');return;}
+      tbtn.classList.add('running');
+      cookTimerIv=setInterval(()=>{
+        secs--;
+        if(secs<=0){clearInterval(cookTimerIv);cookTimerIv=null;tbtn.textContent='✅ 완료!';tbtn.classList.remove('running');return;}
+        const m=Math.floor(secs/60),s=secs%60;
+        tbtn.textContent=(m?m+'분 ':'')+(s<10?'0':'')+s+'초';
+      },1000);
+    };
+  }
 }
 
 // ── IMPORT ───────────────────────────────────────────────────
@@ -984,6 +1087,9 @@ function renderSettings(){
 // ── INIT ─────────────────────────────────────────────────────
 document.getElementById('detail-back').onclick=closeDetail;
 document.getElementById('import-back').onclick=()=>{ editingId=null; closeImport(); };
+document.getElementById('cook-close').onclick=closeCook;
+document.getElementById('cook-prev').onclick=()=>renderCookStep(cookStep-1);
+document.getElementById('cook-next').onclick=()=>{ if(cookStep===(cookRecipe?.steps||[]).length-1) closeCook(); else renderCookStep(cookStep+1); };
 document.getElementById('fab').onclick=()=>{ editingId=null; openImport(); };
 document.getElementById('detail-edit').onclick=async()=>{
   if(!detailId) return;
