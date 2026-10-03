@@ -112,9 +112,6 @@ button:disabled{opacity:.35;pointer-events:none}
 .presets{display:flex;gap:6px;padding:12px 0 4px;flex-wrap:wrap}
 .preset{min-height:40px;min-width:48px;padding:0 12px;border-radius:999px;background:var(--sf2);border:none;color:var(--fa);font-size:14px;cursor:pointer;font-variant-numeric:tabular-nums}
 .preset.on{background:var(--ac);color:var(--ac-tx);font-weight:600}
-.salt-row{display:flex;align-items:center;gap:12px;padding:6px 0 4px;font-size:14px;color:var(--fa)}
-.salt-row input[type=range]{flex:1;accent-color:var(--ac);min-height:44px;padding:0;border:none;background:none;box-shadow:none}
-#salt-val{min-width:44px;text-align:right;color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums}
 .src-row{display:flex;align-items:center;gap:10px;padding:8px 16px 4px;font-size:14px;color:var(--fa)}
 .src-row .src{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
 .src-row .src span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -729,7 +726,7 @@ async function loadDetail(){
   if(!r){ closeDetail(); return; }
   detailServings=r.servings||2;
   const baseSalt=calcSalinity(r.ings||[]);
-  detailTargetSalt=baseSalt||1.0;
+  detailTargetSalt=baseSalt||1.0;   // 목표염도 = 원본염도 (간 조절 UI 없음)
   document.getElementById('detail-title').textContent=r.title||'';
   renderDetail(r,baseSalt);
 }
@@ -770,7 +767,6 @@ function paintMults(root,ctx){
 // 구조는 한 번만 그리고, 인분·염도 변경 시에는 숫자만 갱신 (슬라이더 드래그 유지)
 function renderDetail(r,baseSalt){
   const ings=r.ings||[],steps=r.steps||[];
-  const hasSalt=ings.some(i=>i.c==='salt');
   const body=document.getElementById('detail-body');
   const ctx=scaleCtx(r,baseSalt);
 
@@ -782,11 +778,6 @@ function renderDetail(r,baseSalt){
     +'</div><div class="presets">';
   [1,2,4,6,8].forEach(p=>{ html+='<button class="preset" data-p="'+p+'">'+p+'인</button>'; });
   html+='</div>';
-  if(hasSalt&&baseSalt>0){
-    html+='<div class="salt-row"><label for="salt-slider">간</label>'
-      +'<input type="range" id="salt-slider" min="0.5" max="3.0" step="0.05" value="'+detailTargetSalt.toFixed(2)+'">'
-      +'<span id="salt-val">'+detailTargetSalt.toFixed(1)+'%</span></div>';
-  }
   html+='</div>';
 
   if(r.source||r.sourceUrl){
@@ -819,8 +810,6 @@ function renderDetail(r,baseSalt){
   body.querySelectorAll('.preset').forEach(btn=>{
     btn.onclick=()=>{ detailServings=parseInt(btn.dataset.p); refresh(); };
   });
-  const slider=document.getElementById('salt-slider');
-  if(slider) slider.oninput=()=>{ detailTargetSalt=parseFloat(slider.value); refresh(); };
   body.querySelectorAll('[data-timer]').forEach(btn=>{
     btn.onclick=()=>timerToggle(+btn.dataset.timer,+btn.dataset.min);
   });
@@ -837,8 +826,6 @@ function updateAmounts(r,baseSalt){
   const body=document.getElementById('detail-body');
   document.getElementById('dial-val').textContent=detailServings;
   body.querySelectorAll('.preset').forEach(b=>b.classList.toggle('on',+b.dataset.p===detailServings));
-  const sv=document.getElementById('salt-val');
-  if(sv) sv.textContent=detailTargetSalt.toFixed(1)+'%';
   body.querySelectorAll('[data-i]').forEach(el=>{
     const ing=ings[+el.dataset.i]; if(!ing) return;
     el.textContent=el.classList.contains('ing-ref')?ing.n+' '+ctx.fmt(ing):ctx.fmt(ing);
@@ -1252,11 +1239,11 @@ function renderSettings(){
     +rule('linear','× n','고기, 채소, 면, 곡물')
     +rule('damped','× n<sup>0.85</sup>','마늘, 생강, 기름, 향신료, 술')
     +rule('liquid','× n<sup>0.92</sup>','물, 육수, 다시물')
-    +rule('salt','× n<sup>0.92</sup> × 목표염도 / 원본염도','소금, 간장, 액젓, 된장, 굴소스')
+    +rule('salt','× n<sup>0.92</sup>','소금, 간장, 액젓, 된장, 굴소스. 국물이 없는 요리는 × n')
     +rule('fixed','× 1','인분과 무관한 재료')
     +'<p><strong>물·국물이 n<sup>0.92</sup>인 이유.</strong> 증발량은 부피가 아니라 표면적과 시간에 비례합니다. 큰 냄비는 부피에 비해 덜 졸아들어서, 2배 만들 때 물을 2배 넣으면 싱거워집니다.</p>'
     +'<p><strong>향신·양념이 n<sup>0.85</sup>인 이유.</strong> 향과 자극은 비선형으로 느껴집니다. 마늘을 2배 넣으면 2배보다 강하게 느껴집니다.</p>'
-    +'<p><strong>간 슬라이더.</strong> 목표 염도 하나만 바꾸면 모든 간 재료가 함께 다시 계산됩니다. 염도 = Σ(간 재료 g × 소금환산계수) / Σ(국물 g) × 100. 계수는 모두 근사치입니다.</p>'
+    +'<p><strong>간이 n<sup>0.92</sup>인 이유.</strong> 소금은 인분이 아니라 국물 양을 따라갑니다. 계수는 모두 근사치입니다.</p>'
     +'</div></details></div>'
 
     +'<div class="set-block">'
