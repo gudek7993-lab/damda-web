@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e1e2e">
 <title>Damda</title>
@@ -12,7 +12,7 @@
 :root{--bg:#1e1e2e;--sf:#2a2a3e;--sf2:#313244;--bd:#45475a;--tx:#cdd6f4;--fa:#a6adc8;--ac:#cba6f7;--gr:#a6e3a1;--re:#f38ba8;--yw:#f9e2af;--bl:#89b4fa;--r:12px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,'Noto Sans KR',sans-serif;font-size:15px;overflow:hidden}
-.screen{position:fixed;inset:0;overflow-y:auto;display:none;padding-bottom:70px}
+.screen{position:fixed;inset:0;overflow-y:auto;display:none;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
 .screen.on{display:block}
 .overlay{position:fixed;inset:0;background:var(--bg);overflow-y:auto;display:none;z-index:20;padding-bottom:80px}
 .overlay.on{display:block}
@@ -22,8 +22,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .hd-btn{background:none;border:none;color:var(--fa);font-size:22px;cursor:pointer;padding:4px 6px;line-height:1}
 .hd-btn.accent{color:var(--ac)}
 .hd-btn.danger{color:var(--re)}
-#fab{position:fixed;right:20px;bottom:74px;z-index:15;width:56px;height:56px;border-radius:50%;background:var(--ac);color:var(--bg);border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(203,166,247,.4);display:flex;align-items:center;justify-content:center}
-#bot-nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--sf);display:flex;border-top:1px solid var(--sf2);height:54px}
+#fab{position:fixed;right:20px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:15;width:56px;height:56px;border-radius:50%;background:var(--ac);color:var(--bg);border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(203,166,247,.4);display:flex;align-items:center;justify-content:center}
+#bot-nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--sf);display:flex;border-top:1px solid var(--sf2);height:calc(54px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}
 #bot-nav button{flex:1;background:none;border:none;color:var(--fa);font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 #bot-nav button.on{color:var(--ac)}
 #bot-nav svg{width:20px;height:20px}
@@ -67,7 +67,7 @@ td{padding:8px;border-bottom:1px solid var(--sf2)}
 .step-timer.running{color:var(--yw)}
 .set-block{background:var(--sf);border-radius:var(--r);padding:14px 16px;margin:0 12px 10px}
 .set-title{font-size:13px;color:var(--fa);margin-bottom:8px}
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bd);color:var(--tx);padding:10px 20px;border-radius:999px;font-size:14px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--bd);color:var(--tx);padding:10px 20px;border-radius:999px;font-size:14px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1}
 .spinner{display:inline-block;width:22px;height:22px;border:3px solid var(--sf2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -91,11 +91,15 @@ details summary::-webkit-details-marker{display:none}
 .cook-prog{flex:1;text-align:center;font-size:14px;color:var(--fa);font-weight:600}
 #cook-close{background:none;border:none;color:var(--fa);font-size:22px;cursor:pointer;padding:4px 8px;line-height:1}
 #cook-body{padding:28px 20px 180px}
+.cook-chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px}
+.cook-chips:not(:empty){padding:10px 16px 0}
+.cook-chip{background:var(--sf2);border:none;color:var(--yw);font:inherit;font-size:13px;font-weight:600;padding:8px 12px;border-radius:999px;cursor:pointer}
+.cook-chip.done,.step-timer.done,.cook-timer-btn.done{color:var(--gr)}
 .cook-step-title{font-size:14px;color:var(--fa);margin-bottom:16px;font-weight:500}
 .cook-step-desc{font-size:24px;line-height:1.8;color:var(--tx)}
 .cook-timer-btn{margin-top:24px;width:100%;padding:18px;border-radius:12px;background:var(--sf2);border:none;color:var(--bl);font-size:18px;font-weight:600;cursor:pointer;font-family:inherit}
 .cook-timer-btn.running{color:var(--yw)}
-.cook-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px;background:var(--bg);border-top:1px solid var(--sf2)}
+.cook-nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--sf2)}
 #cook-prev{padding:18px;font-size:17px;font-weight:700;border-radius:12px;border:none;cursor:pointer;font-family:inherit;background:var(--sf2);color:var(--tx)}
 #cook-next{padding:18px;font-size:17px;font-weight:700;border-radius:12px;border:none;cursor:pointer;font-family:inherit;background:var(--ac);color:var(--bg)}
 </style>
@@ -150,6 +154,7 @@ details summary::-webkit-details-marker{display:none}
     <span class="cook-prog" id="cook-prog"></span>
     <span style="width:38px"></span>
   </div>
+  <div id="cook-chips" class="cook-chips"></div>
   <div id="cook-body"></div>
   <div class="cook-nav">
     <button id="cook-prev">← 이전</button>
@@ -462,17 +467,88 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 let detailId=null;
 let detailServings=2;
 let detailTargetSalt=null;
-let timerIntervals={};
+
+// ── WAKE LOCK (한 번만 요청, 닫을 때 해제, 앱 복귀 시 재요청) ──
+let wakeSentinel=null,wakeWanted=false;
+async function wakeOn(){
+  wakeWanted=true;
+  if(!navigator.wakeLock||wakeSentinel) return;
+  try{
+    wakeSentinel=await navigator.wakeLock.request('screen');
+    wakeSentinel.addEventListener('release',()=>{ wakeSentinel=null; });
+  }catch(e){}
+}
+function wakeOff(){
+  wakeWanted=false;
+  if(wakeSentinel){ wakeSentinel.release().catch(()=>{}); wakeSentinel=null; }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&wakeWanted) wakeOn();
+});
+
+// ── TIMERS (단계별, 상세·조리 모드 공용, 단계 이동해도 유지) ───
+const timers={};   // stepIdx -> {end, min, done}
+let timerTick=null,audioCtx=null;
+function ensureAudio(){
+  try{ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
+}
+function beep(){
+  if(!audioCtx) return;
+  const t0=audioCtx.currentTime;
+  for(let k=0;k<3;k++){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.frequency.value=880; o.connect(g); g.connect(audioCtx.destination);
+    const s=t0+k*0.45;
+    g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.4,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.3);
+    o.start(s); o.stop(s+0.32);
+  }
+}
+function timerAlarm(idx){
+  if(navigator.vibrate) navigator.vibrate([400,200,400,200,400]);
+  beep();
+  toast((idx+1)+'단계 타이머 완료');
+}
+function timerToggle(idx,min){
+  const t=timers[idx];
+  if(t) delete timers[idx];                       // 실행 중이면 취소, 완료 상태면 초기화
+  else{ timers[idx]={end:Date.now()+min*60000,min,done:false}; ensureAudio(); }
+  if(!timerTick&&Object.keys(timers).length) timerTick=setInterval(tickTimers,250);
+  tickTimers();
+}
+function timerLeft(t){ return Math.max(0,Math.ceil((t.end-Date.now())/1000)); }
+function fmtClock(s){ return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function tickTimers(){
+  for(const [idx,t] of Object.entries(timers)){
+    if(!t.done&&timerLeft(t)<=0){ t.done=true; timerAlarm(+idx); }
+  }
+  paintTimers();
+  if(!Object.values(timers).some(t=>!t.done)&&timerTick){ clearInterval(timerTick); timerTick=null; }
+}
+function clearTimers(){
+  for(const k of Object.keys(timers)) delete timers[k];
+  if(timerTick){ clearInterval(timerTick); timerTick=null; }
+}
+function paintTimers(){
+  document.querySelectorAll('[data-timer]').forEach(btn=>{
+    const idx=+btn.dataset.timer,t=timers[idx];
+    btn.classList.toggle('running',!!t&&!t.done);
+    btn.classList.toggle('done',!!t&&t.done);
+    const label=btn.querySelector('.t-label');
+    if(label) label.textContent=!t?btn.dataset.min+'분':t.done?'완료':fmtClock(timerLeft(t));
+  });
+  if(typeof paintCookChips==='function') paintCookChips();
+}
 
 function openDetail(id){
   detailId=id;
   document.getElementById('s-detail').classList.add('on');
+  wakeOn();
   loadDetail();
 }
 function closeDetail(){
   document.getElementById('s-detail').classList.remove('on');
-  Object.values(timerIntervals).forEach(clearInterval);
-  timerIntervals={};
+  clearTimers();
+  wakeOff();
   detailId=null;
 }
 
@@ -486,12 +562,17 @@ async function loadDetail(){
   renderDetail(r,baseSalt);
 }
 
-function renderDetail(r,baseSalt){
+function detailScale(r,baseSalt){
   const n=detailServings/(r.servings||1);
-  const tSalt=detailTargetSalt;
   const hasLiq=(r.ings||[]).some(i=>i.c==='liquid');
+  return ing=>fmtAmt(scaleAmt(ing,n,baseSalt,detailTargetSalt,hasLiq),ing.u);
+}
+
+// 구조는 한 번만 그리고, 인분·염도 변경 시에는 숫자만 갱신 (슬라이더 드래그 유지)
+function renderDetail(r,baseSalt){
   const hasSalt=(r.ings||[]).some(i=>i.c==='salt');
   const body=document.getElementById('detail-body');
+  const fmt=detailScale(r,baseSalt);
 
   let html='';
 
@@ -504,7 +585,7 @@ function renderDetail(r,baseSalt){
     +'</div>'
     +'<div class="presets">';
   [1,2,4,6,8].forEach(p=>{
-    html+='<button class="preset'+(detailServings===p?' on':'')+'" data-p="'+p+'">'+p+'인</button>';
+    html+='<button class="preset" data-p="'+p+'">'+p+'인</button>';
   });
   html+='</div>';
 
@@ -512,8 +593,8 @@ function renderDetail(r,baseSalt){
   if(hasSalt&&baseSalt>0){
     html+='<div class="salt-row">'
       +'<span>간</span>'
-      +'<input type="range" id="salt-slider" min="0.5" max="3.0" step="0.05" value="'+tSalt.toFixed(2)+'">'
-      +'<span id="salt-val">'+tSalt.toFixed(1)+'%</span>'
+      +'<input type="range" id="salt-slider" min="0.5" max="3.0" step="0.05" value="'+detailTargetSalt.toFixed(2)+'">'
+      +'<span id="salt-val">'+detailTargetSalt.toFixed(1)+'%</span>'
       +'</div>';
   }
 
@@ -528,11 +609,10 @@ function renderDetail(r,baseSalt){
   // Ingredients
   html+='<div class="section"><h2 style="font-size:14px;color:var(--fa);margin-bottom:8px">재료</h2>'
     +'<table><thead><tr><th>재료</th><th>양</th><th></th></tr></thead><tbody>';
-  (r.ings||[]).forEach(ing=>{
-    const scaled=scaleAmt(ing,n,baseSalt,tSalt,hasLiq);
+  (r.ings||[]).forEach((ing,i)=>{
     html+='<tr>'
       +'<td>'+esc(ing.n)+'</td>'
-      +'<td>'+fmtAmt(scaled,ing.u)+'</td>'
+      +'<td class="amt" data-i="'+i+'">'+fmt(ing)+'</td>'
       +'<td><span class="ing-cls '+esc(ing.c)+'">'+esc(ing.c)+'</span></td>'
       +'</tr>';
   });
@@ -545,12 +625,11 @@ function renderDetail(r,baseSalt){
     +((r.steps||[]).length?'<button id="btn-cook-start" style="background:var(--ac);color:var(--bg);border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">▶ 조리 시작</button>':'')
     +'</div>';
   (r.steps||[]).forEach((step,i)=>{
-    const desc=formatStepDesc(step.d||'',r.ings||[],ing=>fmtAmt(scaleAmt(ing,n,baseSalt,tSalt,hasLiq),ing.u));
     html+='<div class="step-item">'
-      +'<div class="step-num">'+( i+1)+'단계'+(step.t?' — '+esc(step.t):'')+'</div>'
-      +'<div class="step-desc">'+desc+'</div>';
+      +'<div class="step-num">'+(i+1)+'단계'+(step.t?' — '+esc(step.t):'')+'</div>'
+      +'<div class="step-desc">'+formatStepDesc(step.d||'',r.ings||[],fmt)+'</div>';
     if(step.m>0){
-      html+='<button class="step-timer" data-min="'+step.m+'" data-idx="'+i+'" id="timer-btn-'+i+'">⏱ '+step.m+'분</button>';
+      html+='<button class="step-timer" data-timer="'+i+'" data-min="'+step.m+'">⏱ <span class="t-label">'+step.m+'분</span></button>';
     }
     html+='</div>';
   });
@@ -561,75 +640,73 @@ function renderDetail(r,baseSalt){
   body.innerHTML=html;
 
   // attach events
-  document.getElementById('dial-minus').onclick=()=>changeSrv(-1,r,baseSalt);
-  document.getElementById('dial-plus').onclick=()=>changeSrv(1,r,baseSalt);
+  const refresh=()=>updateAmounts(r,baseSalt);
+  document.getElementById('dial-minus').onclick=()=>{ detailServings=Math.max(1,detailServings-1); refresh(); };
+  document.getElementById('dial-plus').onclick=()=>{ detailServings++; refresh(); };
   body.querySelectorAll('.preset').forEach(btn=>{
-    btn.onclick=()=>{ detailServings=parseInt(btn.dataset.p); renderDetail(r,baseSalt); };
+    btn.onclick=()=>{ detailServings=parseInt(btn.dataset.p); refresh(); };
   });
   const slider=document.getElementById('salt-slider');
   if(slider){
-    slider.oninput=()=>{
-      detailTargetSalt=parseFloat(slider.value);
-      document.getElementById('salt-val').textContent=detailTargetSalt.toFixed(1)+'%';
-      renderDetail(r,baseSalt);
-    };
+    slider.oninput=()=>{ detailTargetSalt=parseFloat(slider.value); refresh(); };
   }
-  body.querySelectorAll('.step-timer').forEach(btn=>{
-    btn.onclick=()=>startTimer(btn,parseInt(btn.dataset.min),parseInt(btn.dataset.idx));
+  body.querySelectorAll('[data-timer]').forEach(btn=>{
+    btn.onclick=()=>timerToggle(+btn.dataset.timer,+btn.dataset.min);
   });
 
   const cookBtn=document.getElementById('btn-cook-start');
   if(cookBtn) cookBtn.onclick=()=>openCook(r,baseSalt);
 
-  // Wake Lock
-  if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(()=>{});
+  refresh();
+  paintTimers();
 }
 
-function changeSrv(delta,r,baseSalt){
-  detailServings=Math.max(1,detailServings+delta);
-  renderDetail(r,baseSalt);
+function updateAmounts(r,baseSalt){
+  const fmt=detailScale(r,baseSalt);
+  const ings=r.ings||[];
+  document.getElementById('dial-val').textContent=detailServings;
+  document.querySelectorAll('#detail-body .preset').forEach(b=>b.classList.toggle('on',+b.dataset.p===detailServings));
+  const sv=document.getElementById('salt-val');
+  if(sv) sv.textContent=detailTargetSalt.toFixed(1)+'%';
+  document.querySelectorAll('#detail-body [data-i]').forEach(el=>{
+    const ing=ings[+el.dataset.i]; if(!ing) return;
+    el.textContent=el.classList.contains('ing-ref')?ing.n+' '+fmt(ing):fmt(ing);
+  });
 }
 
 function formatStepDesc(desc,ings,fmtFn){
   return esc(desc).replace(/\{([^}]+)\}/g,(m,name)=>{
-    const ing=ings.find(i=>i.n===name);
-    return ing?('<strong style="color:var(--ac)">'+esc(name)+' '+fmtFn(ing)+'</strong>'):esc(name);
+    const i=ings.findIndex(x=>x.n===name);
+    return i>=0?('<strong class="ing-ref" data-i="'+i+'">'+esc(name)+' '+fmtFn(ings[i])+'</strong>'):esc(name);
   });
 }
 
-function startTimer(btn,minutes,idx){
-  if(timerIntervals[idx]){ clearInterval(timerIntervals[idx]); delete timerIntervals[idx]; btn.textContent='⏱ '+minutes+'분'; btn.classList.remove('running'); return; }
-  let secs=minutes*60;
-  btn.classList.add('running');
-  const tick=()=>{
-    secs--;
-    if(secs<=0){ clearInterval(timerIntervals[idx]); delete timerIntervals[idx]; btn.textContent='✅ 완료!'; btn.classList.remove('running'); return; }
-    const m=Math.floor(secs/60),s=secs%60;
-    btn.textContent=(m?m+'분 ':'')+(s<10?'0':'')+s+'초';
-  };
-  tick();
-  timerIntervals[idx]=setInterval(tick,1000);
-}
-
 // ── COOK MODE ────────────────────────────────────────────────
-let cookRecipe=null,cookStep=0,cookN=1,cookBaseSalt=0,cookHasLiq=false,cookTSalt=0,cookTimerIv=null;
+let cookRecipe=null,cookStep=0,cookFmt=null;
 
 function openCook(r,baseSalt){
   cookRecipe=r;
-  cookN=detailServings/(r.servings||1);
-  cookBaseSalt=baseSalt;
-  cookHasLiq=(r.ings||[]).some(i=>i.c==='liquid');
-  cookTSalt=detailTargetSalt||baseSalt||1;
-  if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;}
+  cookFmt=detailScale(r,baseSalt);   // 상세 화면의 인분·염도 그대로
   document.getElementById('s-cook').classList.add('on');
   renderCookStep(0);
-  if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(()=>{});
+  wakeOn();
 }
 
 function closeCook(){
   document.getElementById('s-cook').classList.remove('on');
-  if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;}
   cookRecipe=null;
+  if(detailId) paintTimers();   // 상세 화면으로 돌아가면 타이머 계속 표시
+}
+
+// 다른 단계에서 돌고 있는 타이머를 헤더 칩으로 표시 (탭하면 그 단계로 이동)
+function paintCookChips(){
+  const box=document.getElementById('cook-chips');
+  if(!box||!cookRecipe) return;
+  const items=Object.entries(timers).filter(([idx])=>+idx!==cookStep);
+  box.innerHTML=items.map(([idx,t])=>
+    '<button class="cook-chip'+(t.done?' done':'')+'" data-go="'+idx+'">'+(+idx+1)+'단계 '+(t.done?'완료':fmtClock(timerLeft(t)))+'</button>'
+  ).join('');
+  box.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>renderCookStep(+b.dataset.go));
 }
 
 function renderCookStep(idx){
@@ -641,38 +718,21 @@ function renderCookStep(idx){
   const isLast=cookStep===total-1;
   const isFirst=cookStep===0;
 
-  document.getElementById('cook-prog').textContent=(cookStep+1)+' / '+total+' 단계'+(step.t?' — '+esc(step.t):'');
+  document.getElementById('cook-prog').textContent=(cookStep+1)+' / '+total+' 단계'+(step.t?' — '+step.t:'');
   const prevBtn=document.getElementById('cook-prev');
   const nextBtn=document.getElementById('cook-next');
   prevBtn.disabled=isFirst; prevBtn.style.opacity=isFirst?'0.3':'1';
   nextBtn.textContent=isLast?'완료 ✓':'다음 →';
   nextBtn.style.background=isLast?'var(--gr)':'var(--ac)';
-  nextBtn.style.color=isLast?'var(--bg)':'var(--bg)';
 
-  if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;}
-
-  const desc=formatStepDesc(step.d||'',cookRecipe.ings||[],
-    ing=>fmtAmt(scaleAmt(ing,cookN,cookBaseSalt,cookTSalt,cookHasLiq),ing.u));
-
-  let html='<div class="cook-step-desc">'+desc+'</div>';
-  if(step.m>0) html+='<button class="cook-timer-btn" id="cook-tbtn">⏱ '+step.m+'분</button>';
+  let html='<div class="cook-step-desc">'+formatStepDesc(step.d||'',cookRecipe.ings||[],cookFmt)+'</div>';
+  if(step.m>0) html+='<button class="cook-timer-btn" data-timer="'+cookStep+'" data-min="'+step.m+'">⏱ <span class="t-label">'+step.m+'분</span></button>';
   document.getElementById('cook-body').innerHTML=html;
   document.getElementById('s-cook').scrollTo(0,0);
 
-  if(step.m>0){
-    let secs=step.m*60;
-    const tbtn=document.getElementById('cook-tbtn');
-    tbtn.onclick=()=>{
-      if(cookTimerIv){clearInterval(cookTimerIv);cookTimerIv=null;tbtn.textContent='⏱ '+step.m+'분';tbtn.classList.remove('running');return;}
-      tbtn.classList.add('running');
-      cookTimerIv=setInterval(()=>{
-        secs--;
-        if(secs<=0){clearInterval(cookTimerIv);cookTimerIv=null;tbtn.textContent='✅ 완료!';tbtn.classList.remove('running');return;}
-        const m=Math.floor(secs/60),s=secs%60;
-        tbtn.textContent=(m?m+'분 ':'')+(s<10?'0':'')+s+'초';
-      },1000);
-    };
-  }
+  const tbtn=document.querySelector('#cook-body [data-timer]');
+  if(tbtn) tbtn.onclick=()=>timerToggle(cookStep,step.m);
+  paintTimers();
 }
 
 // ── IMPORT ───────────────────────────────────────────────────
