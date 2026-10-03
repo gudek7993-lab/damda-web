@@ -5,8 +5,8 @@
   "start_url": "/damda-web/",
   "scope": "/damda-web/",
   "display": "standalone",
-  "background_color": "#1e1e2e",
-  "theme_color": "#1e1e2e",
+  "background_color": "#15181d",
+  "theme_color": "#15181d",
   "orientation": "portrait",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
