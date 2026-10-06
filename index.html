@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#15181d">
+<meta name="theme-color" content="#15181d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
 <title>Damda</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -22,6 +23,13 @@
   /* shape rule: surfaces 14, controls 10, chips + round buttons full */
   --r-s:14px;--r-c:10px;
   --ease:cubic-bezier(.2,.7,.2,1);
+}
+@media (prefers-color-scheme:light){
+  :root{--bg:#f6f7f9;--sf:#fff;--sf2:#eceef1;--bd:#d5d9df;--tx:#1b1f24;--fa:#5c6672;
+    --ac:#c0532d;--ac-tx:#fff;--ac-soft:rgba(192,83,45,.12);
+    --c-linear:#2b7f44;--c-damped:#a06a00;--c-liquid:#2b6cb0;--c-salt:#c2415a;--c-fixed:#5c6672;
+    --danger:#c93c43;--danger-soft:rgba(201,60,67,.1)}
+  .card,.step-item,.set-block,.pick-card{box-shadow:0 0 0 1px var(--sf2),0 1px 2px rgba(5,7,10,.04)}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--tx);overflow:hidden}
@@ -62,6 +70,9 @@ input[type=search]::-webkit-search-cancel-button{filter:grayscale(1) brightness(
 .pill.on{background:var(--ac);color:var(--ac-tx);font-weight:600}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;padding:12px 16px}
 .card{border:none;text-align:left;color:inherit;width:100%;background:var(--sf);border-radius:var(--r-s);padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:112px}
+.thumb{display:block;width:calc(100% + 28px);margin:-14px -14px 8px;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r-s) var(--r-s) 0 0;background:var(--sf2);outline:1px solid rgba(127,127,127,.15);outline-offset:-1px}
+.src-thumb{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;flex:none;outline:1px solid rgba(127,127,127,.15);outline-offset:-1px}
+.card-title .i{width:15px;height:15px;color:var(--ac);vertical-align:-1px;margin-left:4px}
 .card-title{font-weight:600;font-size:17px;line-height:1.35;text-wrap:balance}
 .card-src{font-size:13px;color:var(--fa);display:flex;align-items:center;gap:5px;min-width:0}
 .card-src span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -76,6 +87,7 @@ input[type=search]::-webkit-search-cancel-button{filter:grayscale(1) brightness(
 #bot-nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--sf);display:flex;border-top:1px solid var(--sf2);height:calc(56px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}
 #bot-nav button{flex:1;background:none;border:none;color:var(--fa);font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 #bot-nav button.on{color:var(--ac)}
+#detail-fav[aria-pressed=true]{color:var(--ac)}
 
 /* ── sections & forms ── */
 .section{padding:16px}
@@ -208,7 +220,7 @@ details[open] summary .i{transform:rotate(90deg)}
 .explain p+p{margin-top:10px}
 .explain strong{color:var(--tx)}
 
-#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,8px);max-width:calc(100% - 32px);width:max-content;text-align:center;background:#2f353e;color:var(--tx);padding:12px 18px;border-radius:var(--r-s);font-size:15px;z-index:99;opacity:0;pointer-events:none;
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translate(-50%,8px);max-width:calc(100% - 32px);width:max-content;text-align:center;background:#2f353e;color:#e8eaed;padding:12px 18px;border-radius:var(--r-s);font-size:15px;z-index:99;opacity:0;pointer-events:none;
   box-shadow:0 8px 24px rgba(5,7,10,.5);transition:opacity 150ms ease-out,transform 150ms ease-out}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
@@ -236,6 +248,8 @@ details[open] summary .i{transform:rotate(90deg)}
 <symbol id="i-timer" viewBox="0 0 256 256"><path d="M128,40a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,40Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,128,216ZM173.66,90.34a8,8,0,0,1,0,11.32l-40,40a8,8,0,0,1-11.32-11.32l40-40A8,8,0,0,1,173.66,90.34ZM96,16a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,16Z"/></symbol>
 <symbol id="i-trash" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></symbol>
 <symbol id="i-warning-circle" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol>
+<symbol id="i-star" viewBox="0 0 256 256"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></symbol>
+<symbol id="i-star-fill" viewBox="0 0 256 256"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></symbol>
 <symbol id="i-x" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol>
 <symbol id="i-youtube-logo" viewBox="0 0 256 256"><path d="M164.44,121.34l-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17ZM234.33,69.52a24,24,0,0,0-14.49-16.4C185.56,39.88,131,40,128,40s-57.56-.12-91.84,13.12a24,24,0,0,0-14.49,16.4C19.08,79.5,16,97.74,16,128s3.08,48.5,5.67,58.48a24,24,0,0,0,14.49,16.41C69,215.56,120.4,216,127.34,216h1.32c6.94,0,58.37-.44,91.18-13.11a24,24,0,0,0,14.49-16.41c2.59-10,5.67-28.22,5.67-58.48S236.92,79.5,234.33,69.52Zm-15.49,113a8,8,0,0,1-4.77,5.49c-31.65,12.22-85.48,12-86,12H128c-.54,0-54.33.2-86-12a8,8,0,0,1-4.77-5.49C34.8,173.39,32,156.57,32,128s2.8-45.39,5.16-54.47A8,8,0,0,1,41.93,68c30.52-11.79,81.66-12,85.85-12h.27c.54,0,54.38-.18,86,12a8,8,0,0,1,4.77,5.49C221.2,82.61,224,99.43,224,128S221.2,173.39,218.84,182.47Z"/></symbol>
 </svg>
@@ -254,7 +268,7 @@ details[open] summary .i{transform:rotate(90deg)}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><span class="ver">Damda v7</span></div>
+  <div class="hd"><h1>설정</h1><span class="ver">Damda v8</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -263,6 +277,7 @@ details[open] summary .i{transform:rotate(90deg)}
   <div class="hd has-back">
     <button class="icon-btn" id="detail-back" aria-label="뒤로"><svg class="i"><use href="#i-arrow-left"/></svg></button>
     <h1 id="detail-title"></h1>
+    <button class="icon-btn" id="detail-fav" aria-label="즐겨찾기" aria-pressed="false"></button>
     <button class="icon-btn" id="detail-edit" aria-label="수정"><svg class="i"><use href="#i-pencil-simple"/></svg></button>
   </div>
   <div id="detail-body"></div>
@@ -543,6 +558,7 @@ async function parseFromVideo(videoId, extraDesc='', isShorts=false){
 const ic=(name,cls='')=>'<svg class="i'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+name+'"/></svg>';
 const CLS_LABEL={linear:'주재료',damped:'향신·양념',liquid:'물·국물',salt:'간',fixed:'고정'};
 const clsOf=c=>ALL_CLS.includes(c)?c:'linear';
+const ytThumb=(url,cls)=>{ const id=url&&extractVideoId(url); return id?'<img class="'+cls+'" src="https://i.ytimg.com/vi/'+id+'/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">':''; };
 
 // 바텀 시트: 내용 HTML을 받아 열고, 닫힐 때 resolve
 let _sheetDone=null;
@@ -574,10 +590,10 @@ let searchQuery='';
 
 async function renderList(){
   allRecipes=await dbAll();
-  allRecipes.sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
+  allRecipes.sort((a,b)=>(!!b.fav-!!a.fav)||((b.savedAt||0)-(a.savedAt||0)));
 
   // filter pills
-  const cuisines=['전체',...new Set(allRecipes.map(r=>r.cuisine).filter(Boolean))];
+  const cuisines=['전체',...(allRecipes.some(r=>r.fav)?['즐겨찾기']:[]),...new Set(allRecipes.map(r=>r.cuisine).filter(Boolean))];
   const pillsEl=document.getElementById('filter-pills');
   pillsEl.innerHTML='';
   pillsEl.style.display=allRecipes.length?'':'none';
@@ -592,7 +608,8 @@ async function renderList(){
   // filter + search
   const q=searchQuery.toLowerCase();
   const shown=allRecipes.filter(r=>{
-    if(activeFilter!=='전체'&&r.cuisine!==activeFilter) return false;
+    if(activeFilter==='즐겨찾기'){ if(!r.fav) return false; }
+    else if(activeFilter!=='전체'&&r.cuisine!==activeFilter) return false;
     if(q){
       const inTitle=r.title?.toLowerCase().includes(q);
       const inIngs=r.ings?.some(i=>i.n?.toLowerCase().includes(q));
@@ -618,7 +635,7 @@ async function renderList(){
     const matchedIng=q&&!inTitle?r.ings?.find(i=>i.n?.toLowerCase().includes(q)):null;
     const card=document.createElement('button');
     card.className='card';
-    card.innerHTML='<div class="card-title">'+esc(r.title||'제목없음')+'</div>'
+    card.innerHTML=ytThumb(r.sourceUrl,'thumb')+'<div class="card-title">'+esc(r.title||'제목없음')+(r.fav?ic('star-fill'):'')+'</div>'
       +(r.source?'<div class="card-src">'+(r.sourceUrl?ic('youtube-logo','i-sm'):'')+'<span>'+esc(r.source)+'</span></div>':'')
       +(matchedIng?'<div class="card-match">'+ic('magnifying-glass','i-sm')+esc(matchedIng.n)+'</div>':'')
       +'<div class="card-meta"><span>'+esc([r.cuisine,r.dish].filter(Boolean).join(' '))+'</span><span class="num">'+esc(r.servings||'')+'인분</span></div>';
@@ -781,7 +798,7 @@ function renderDetail(r,baseSalt){
   html+='</div>';
 
   if(r.source||r.sourceUrl){
-    html+='<div class="src-row"><span class="src">'+(r.sourceUrl?ic('youtube-logo','i-sm'):'')+'<span>'+esc(r.source||'원본 영상')+'</span></span>'
+    html+='<div class="src-row"><span class="src">'+(r.sourceUrl?(ytThumb(r.sourceUrl,'src-thumb')||ic('youtube-logo','i-sm')):'')+'<span>'+esc(r.source||'원본 영상')+'</span></span>'
       +(r.sourceUrl?'<a class="btn btn-ghost btn-sm" href="'+esc(r.sourceUrl)+'" target="_blank" rel="noopener">'+ic('play','i-sm')+'영상 보기</a>':'')
       +'</div>';
   }
@@ -813,6 +830,11 @@ function renderDetail(r,baseSalt){
   body.querySelectorAll('[data-timer]').forEach(btn=>{
     btn.onclick=()=>timerToggle(+btn.dataset.timer,+btn.dataset.min);
   });
+  const favBtn=document.getElementById('detail-fav');
+  const paintFav=()=>{ favBtn.innerHTML=ic(r.fav?'star-fill':'star'); favBtn.setAttribute('aria-pressed',!!r.fav); };
+  favBtn.onclick=async()=>{ r.fav=!r.fav; paintFav(); await dbPut(r); renderList(); };
+  paintFav();
+
   const cookBtn=document.getElementById('btn-cook-start');
   if(cookBtn) cookBtn.onclick=()=>openCook(r,baseSalt);
 
@@ -954,7 +976,8 @@ function renderImportStep1(){
     +'<div class="help">YouTube 영상 › 더보기 › 스크립트 표시 › 전체 복사</div>'
     +'<textarea id="paste-input" placeholder="자막을 붙여넣으세요…" style="min-height:160px"></textarea></div>'
     +'<button class="btn btn-ghost" id="btn-parse-text">자막으로 분석하기</button>'
-    +'</details></div>';
+    +'</details></div>'
+    +'<div class="section"><button class="btn btn-ghost" id="btn-manual">'+ic('pencil-simple','i-sm')+'직접 입력하기</button></div>';
 
   document.getElementById('btn-parse-url').onclick=async()=>{
     const url=document.getElementById('yt-url').value.trim();
@@ -996,6 +1019,11 @@ function renderImportStep1(){
     }
     currentSourceUrl=url;
     await runParse(()=>parseFromVideo(vid,desc,shorts), infoMsg);
+  };
+  document.getElementById('btn-manual').onclick=()=>{
+    currentSourceUrl='';
+    renderReview({servings:2,ings:[{n:'',a:0,u:'g',c:'linear'}],steps:[{}]});
+    document.getElementById('import-title').textContent='직접 입력';
   };
   document.getElementById('btn-parse-text').onclick=async()=>{
     const raw=document.getElementById('paste-input')?.value.trim();
@@ -1174,8 +1202,10 @@ async function saveReview(){
     m: parseInt(row.querySelector('.r-step-m')?.value)||0,
   })).filter(s=>s.d);
 
+  const prev=editingId?await dbGet(editingId):null;
   const recipe={
     id: editingId||'r_'+Date.now(),
+    fav: !!prev?.fav,
     title,
     cuisine: document.getElementById('r-cuisine').value,
     servings: parseInt(document.getElementById('r-servings').value)||2,
