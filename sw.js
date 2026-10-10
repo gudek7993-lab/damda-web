@@ -1,4 +1,4 @@
-const CACHE = 'damda-v8';
+const CACHE = 'damda-v9';
 const FONT = 'https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/woff2/PretendardVariable.woff2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 

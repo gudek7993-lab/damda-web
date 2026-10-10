@@ -268,7 +268,7 @@ details[open] summary .i{transform:rotate(90deg)}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><span class="ver">Damda v8</span></div>
+  <div class="hd"><h1>설정</h1><span class="ver">Damda v9</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -407,7 +407,7 @@ function fmtAmt(val,unit){
   if(val===0) return '소량';
   if(unit==='g'&&val>=1000) return round(val/1000)+'kg';
   if(unit==='ml'&&val>=1000) return round(val/1000)+'L';
-  return round(val)+unit;
+  return round(val)+esc(unit);
 }
 
 // ── AUTO-CLASSIFY ────────────────────────────────────────────
@@ -463,8 +463,8 @@ async function geminiCall(parts){
   const isVideo=parts.some(p=>p.fileData);
   console.log('[Gemini] 요청 시작', isVideo?'(영상 모드)':'(텍스트 모드)');
   const res=await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key='+key,
-    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})}
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
+    {method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts}]})}
   );
   if(!res.ok){
     const e=await res.json().catch(()=>({}));
@@ -558,6 +558,7 @@ async function parseFromVideo(videoId, extraDesc='', isShorts=false){
 const ic=(name,cls='')=>'<svg class="i'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+name+'"/></svg>';
 const CLS_LABEL={linear:'주재료',damped:'향신·양념',liquid:'물·국물',salt:'간',fixed:'고정'};
 const clsOf=c=>ALL_CLS.includes(c)?c:'linear';
+const safeUrl=u=>/^https?:\/\//i.test(u||'')?u:'';
 const ytThumb=(url,cls)=>{ const id=url&&extractVideoId(url); return id?'<img class="'+cls+'" src="https://i.ytimg.com/vi/'+id+'/mqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">':''; };
 
 // 바텀 시트: 내용 HTML을 받아 열고, 닫힐 때 resolve
@@ -799,7 +800,7 @@ function renderDetail(r,baseSalt){
 
   if(r.source||r.sourceUrl){
     html+='<div class="src-row"><span class="src">'+(r.sourceUrl?(ytThumb(r.sourceUrl,'src-thumb')||ic('youtube-logo','i-sm')):'')+'<span>'+esc(r.source||'원본 영상')+'</span></span>'
-      +(r.sourceUrl?'<a class="btn btn-ghost btn-sm" href="'+esc(r.sourceUrl)+'" target="_blank" rel="noopener">'+ic('play','i-sm')+'영상 보기</a>':'')
+      +(safeUrl(r.sourceUrl)?'<a class="btn btn-ghost btn-sm" href="'+esc(safeUrl(r.sourceUrl))+'" target="_blank" rel="noopener">'+ic('play','i-sm')+'영상 보기</a>':'')
       +'</div>';
   }
 
@@ -1081,7 +1082,7 @@ function renderRecipeSelect(recipes){
   document.getElementById('btn-sel-back').onclick=()=>{ multiRecipes=null; multiIdx=null; renderImportStep1(); };
 }
 
-function unitOptions(sel){ return (sel&&!ALL_UNITS.includes(sel)?[sel,...ALL_UNITS]:ALL_UNITS).map(u=>'<option'+(u===sel?' selected':'')+'>'+u+'</option>').join(''); }
+function unitOptions(sel){ return (sel&&!ALL_UNITS.includes(sel)?[sel,...ALL_UNITS]:ALL_UNITS).map(u=>'<option'+(u===sel?' selected':'')+'>'+esc(u)+'</option>').join(''); }
 function clsOptions(sel){ return ALL_CLS.map(c=>'<option value="'+c+'"'+(c===sel?' selected':'')+'>'+CLS_LABEL[c]+'</option>').join(''); }
 function ingRowHTML(ing){
   return '<div class="review-ing-row">'
@@ -1108,7 +1109,7 @@ function renderReview(recipe){
   const isEdit=!!editingId;
   document.getElementById('import-title').textContent=isEdit?'레시피 수정':'내용 확인 후 저장';
   const body=document.getElementById('import-body');
-  const srcUrl=recipe.sourceUrl||currentSourceUrl||'';
+  const srcUrl=safeUrl(recipe.sourceUrl||currentSourceUrl);
 
   body.innerHTML=
     '<div class="section">'
