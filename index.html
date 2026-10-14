@@ -268,7 +268,7 @@ details[open] summary .i{transform:rotate(90deg)}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><span class="ver">Damda v9</span></div>
+  <div class="hd"><h1>설정</h1><span class="ver">Damda v10</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -462,13 +462,24 @@ async function geminiCall(parts){
   if(!key||key==='YOUR_GEMINI_KEY_HERE') throw new Error('Gemini API 키가 없습니다.\n설정에서 API 키를 입력해 주세요.');
   const isVideo=parts.some(p=>p.fileData);
   console.log('[Gemini] 요청 시작', isVideo?'(영상 모드)':'(텍스트 모드)');
-  const res=await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
-    {method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts}]})}
-  );
+  // 503(과부하)·429(요청 과다)는 잠깐 뒤 재시도. 거절된 요청은 과금되지 않음
+  const waits=[2000,6000];
+  let res;
+  for(let attempt=0;;attempt++){
+    res=await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
+      {method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts}]})}
+    );
+    if(res.ok||![503,429].includes(res.status)||attempt>=waits.length) break;
+    console.warn('[Gemini] 혼잡', res.status, '재시도', attempt+1);
+    const sub=document.querySelector('#import-body .skel-sub');
+    if(sub) sub.textContent='Gemini 사용량이 많아 다시 시도하는 중 ('+(attempt+2)+'/'+(waits.length+1)+')';
+    await new Promise(r=>setTimeout(r,waits[attempt]));
+  }
   if(!res.ok){
     const e=await res.json().catch(()=>({}));
     console.error('[Gemini] 오류', res.status, e?.error?.message);
+    if([503,429].includes(res.status)) throw new Error('지금 Gemini 사용량이 많습니다.\n1~2분 뒤에 다시 시도해 주세요.');
     throw new Error(e?.error?.message||'Gemini 오류 '+res.status);
   }
   const data=await res.json();
