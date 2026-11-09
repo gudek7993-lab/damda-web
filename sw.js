@@ -20,8 +20,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('generativelanguage.googleapis.com')) return;
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      if (res.ok && e.request.method === 'GET') {
+    caches.match(e.request, { ignoreSearch: e.request.mode === 'navigate' }).then(r => r || fetch(e.request).then(res => {
+      if (res.ok && e.request.method === 'GET' && e.request.mode !== 'navigate') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
