@@ -268,7 +268,7 @@ details[open] summary .i{transform:rotate(90deg)}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><span class="ver">Damda v10</span></div>
+  <div class="hd"><h1>설정</h1><span class="ver">Damda v11</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -549,7 +549,20 @@ async function parseFromText(raw){
 }
 
 // ── PARSE FROM YOUTUBE VIDEO ──────────────────────────────────
-async function parseFromVideo(videoId, extraDesc='', isShorts=false){
+// 영상 제목·채널명 (oEmbed는 CORS 허용 + 키 불필요. Shorts도 watch URL로 바꿔 조회)
+async function fetchVideoMeta(videoId){
+  try{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),6000);
+    const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+videoId),{signal:ctrl.signal});
+    clearTimeout(t);
+    if(!r.ok) return null;
+    const d=await r.json();
+    return {title:String(d.title||''),author:String(d.author_name||'')};
+  }catch(e){ console.warn('[oEmbed] 실패:', e.message); return null; }
+}
+
+async function parseFromVideo(videoId, extraDesc='', isShorts=false, meta=null){
   console.log('[YouTube] 영상 분석 시작 videoId='+videoId+(isShorts?' (Shorts)':''));
   const fileUri=isShorts
     ?'https://www.youtube.com/shorts/'+videoId
@@ -558,9 +571,13 @@ async function parseFromVideo(videoId, extraDesc='', isShorts=false){
   const descNote=extraDesc
     ? '\n\n아래는 영상 설명/댓글 텍스트입니다. 여러 요리가 있으면 각각 별도 레시피로 추출하고, 재료 분량은 이 텍스트의 값을 최우선으로 사용하세요:\n"""\n'+extraDesc+'\n"""'
     : '\n\n영상에 메인 요리 외 곁들임 요리(side dish), 소스, 퓨레, 가니쉬 등이 별도로 나오면 각각 별도 레시피로 추출해.';
-  const textPart={text:'이 요리 영상에서 나오는 레시피를 모두 추출해.'+descNote+'\n\n'+SCHEMA};
+  const metaNote=meta&&(meta.title||meta.author)
+    ? '\n\n영상 정보: 제목 "'+meta.title+'", 채널 "'+meta.author+'" (source는 이 채널명 그대로)'
+    : '';
+  const textPart={text:'이 요리 영상에서 나오는 레시피를 모두 추출해.'+metaNote+descNote+'\n\n'+SCHEMA};
   const r=await geminiCall([filePart,textPart]);
   const recipes=normalizeRecipes(extractJSON(r));
+  if(meta?.author) recipes.forEach(x=>{ x.source=meta.author; });  // Gemini 추측 대신 실제 채널명
   console.log('[YouTube] 파싱 완료', recipes.map(r=>r.title).join(', '));
   return recipes;
 }
@@ -976,8 +993,8 @@ function renderImportStep1(){
     '<div class="section">'
     +'<div class="field"><label for="yt-url">YouTube 링크</label>'
     +'<input id="yt-url" type="url" inputmode="url" placeholder="https://youtu.be/…"></div>'
-    +'<div class="field"><label for="yt-desc">영상 설명 (선택)</label>'
-    +'<div class="help">설명란에 재료와 분량이 있으면 붙여넣으세요. 정확도가 높아집니다.</div>'
+    +'<div class="field"><label for="yt-desc">설명·댓글 (선택)</label>'
+    +'<div class="help">레시피가 설명란이나 고정 댓글에 있으면 복사해 붙여넣으세요. 쇼츠는 대부분 댓글에 있습니다.</div>'
     +'<textarea id="yt-desc" placeholder="재료: 소 갈비살 1.5kg, 레드 와인 1병…" style="min-height:88px"></textarea></div>'
     +'<button class="btn btn-primary" id="btn-parse-url">영상 분석하기</button>'
     +'<div class="help" style="margin-top:8px">Gemini가 영상을 직접 보고 레시피를 추출합니다.</div>'
@@ -998,9 +1015,11 @@ function renderImportStep1(){
     const shorts=isYouTubeShorts(url);
     let desc=document.getElementById('yt-desc')?.value.trim()||'';
     let infoMsg=desc?'직접 입력한 설명 포함':'';
-    // 설명란이 비어 있으면 서버에서 자동 가져오기 시도
-    if(!desc){
-      document.getElementById('import-body').innerHTML=skeletonHTML('영상 정보 가져오는 중');
+    document.getElementById('import-body').innerHTML=skeletonHTML('영상 정보 가져오는 중');
+    const metaP=fetchVideoMeta(vid);
+    // 설명·댓글 자동 수집은 로컬 server.py가 있을 때만 가능 (정적 호스팅에는 /api/info 없음)
+    const hasServer=/^(localhost|127\.|192\.168\.|10\.)/.test(location.hostname);
+    if(!desc&&hasServer){
       try{
         const ctrl=new AbortController();
         setTimeout(()=>ctrl.abort(),15000);
@@ -1018,8 +1037,6 @@ function renderImportStep1(){
           if(d.pinned_comments?.length) found.push('고정댓글 '+d.pinned_comments.length+'개');
           if(d.top_comments?.length) found.push('상위댓글 '+d.top_comments.length+'개');
           infoMsg=found.length?found.join(', ')+' 포함':'설명과 댓글이 없어 영상만 분석합니다';
-          if(desc) console.log('[서버] 설명 포함 ('+desc.length+'자):', desc.slice(0,300));
-          else console.warn('[서버] 설명/댓글 없음, 영상만 분석');
         } else {
           infoMsg='서버 오류('+r.status+')로 영상만 분석합니다';
           console.warn('[서버] /api/info 실패:', r.status);
@@ -1028,9 +1045,14 @@ function renderImportStep1(){
         infoMsg='서버가 꺼져 있어 영상만 분석합니다';
         console.warn('[서버] 연결 실패:', e.message);
       }
+    } else if(!desc){
+      infoMsg=shorts
+        ?'댓글은 자동으로 못 읽어요. 레시피가 댓글에 있으면 붙여넣고 다시 시도하세요'
+        :'설명·댓글은 자동으로 못 읽어 영상만 분석합니다';
     }
+    const meta=await metaP;
     currentSourceUrl=url;
-    await runParse(()=>parseFromVideo(vid,desc,shorts), infoMsg);
+    await runParse(()=>parseFromVideo(vid,desc,shorts,meta), infoMsg);
   };
   document.getElementById('btn-manual').onclick=()=>{
     currentSourceUrl='';
@@ -1047,7 +1069,7 @@ function renderImportStep1(){
 
 async function runParse(parseFn, statusMsg=''){
   const body=document.getElementById('import-body');
-  body.innerHTML=skeletonHTML('Gemini가 분석하는 중',statusMsg,/오류|꺼져|없어/.test(statusMsg));
+  body.innerHTML=skeletonHTML('Gemini가 분석하는 중',statusMsg,/오류|꺼져|없어|못/.test(statusMsg));
   try{
     const recipes=await parseFn();
     if(recipes.length>1){
