@@ -549,6 +549,38 @@ async function parseFromText(raw){
 }
 
 // ── PARSE FROM YOUTUBE VIDEO ──────────────────────────────────
+// YouTube Data API v3: 설명 + 크리에이터 댓글 + 인기 댓글. 키는 설정에서 입력 (웹사이트 제한 + YouTube API 전용 키)
+const getYtKey=()=>window.DAMDA_CONFIG?.youtubeKey||localStorage.getItem('yt-key')||'';
+async function fetchYtInfo(videoId){
+  const key=getYtKey();
+  if(!key) return null;
+  const base='https://www.googleapis.com/youtube/v3/';
+  const get=async(path)=>{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),10000);
+    try{ return await fetch(base+path+'&key='+encodeURIComponent(key),{signal:ctrl.signal}); }
+    finally{ clearTimeout(t); }
+  };
+  const out={description:'',channel:'',creator:[],top:[],note:''};
+  try{
+    const vr=await get('videos?part=snippet&id='+videoId);
+    if(!vr.ok){ out.note='YouTube 키 오류('+vr.status+')'; return out; }
+    const sn=(await vr.json()).items?.[0]?.snippet;
+    if(!sn){ out.note='영상을 찾지 못했습니다'; return out; }
+    out.description=sn.description||''; out.channel=sn.channelTitle||'';
+    const cr=await get('commentThreads?part=snippet&videoId='+videoId+'&maxResults=40&order=relevance&textFormat=plainText');
+    if(cr.ok){
+      for(const it of (await cr.json()).items||[]){
+        const c=it.snippet.topLevelComment.snippet;
+        const text=(c.textDisplay||'').trim();
+        if(!text) continue;
+        if(c.authorChannelId?.value===sn.channelId) out.creator.push(text); else out.top.push(text);
+      }
+    } else out.note='댓글을 읽을 수 없습니다(꺼져 있거나 제한됨)';
+  }catch(e){ out.note='YouTube 연결 실패'; console.warn('[YouTube API]', e.message); }
+  return out;
+}
+
 // 영상 제목·채널명 (oEmbed는 CORS 허용 + 키 불필요. Shorts도 watch URL로 바꿔 조회)
 async function fetchVideoMeta(videoId){
   try{
@@ -1019,7 +1051,23 @@ function renderImportStep1(){
     const metaP=fetchVideoMeta(vid);
     // 설명·댓글 자동 수집은 로컬 server.py가 있을 때만 가능 (정적 호스팅에는 /api/info 없음)
     const hasServer=/^(localhost|127\.|192\.168\.|10\.)/.test(location.hostname);
-    if(!desc&&hasServer){
+    let ytChannel='';
+    const ytKey=getYtKey();
+    if(!desc&&ytKey){
+      const y=await fetchYtInfo(vid);
+      const parts=[];
+      if(y.description) parts.push('=== 영상 설명 ===\n'+y.description);
+      if(y.creator.length) parts.push('=== 크리에이터 댓글 ===\n'+y.creator.slice(0,3).join('\n---\n'));
+      if(y.top.length) parts.push('=== 인기 댓글 (참고) ===\n'+y.top.slice(0,5).join('\n---\n'));
+      desc=parts.join('\n\n');
+      ytChannel=y.channel;
+      const found=[];
+      if(y.description) found.push('설명란');
+      if(y.creator.length) found.push('크리에이터 댓글 '+y.creator.length+'개');
+      if(y.top.length) found.push('인기 댓글 '+Math.min(5,y.top.length)+'개');
+      infoMsg=found.length?found.join(', ')+' 포함':(y.note||'설명과 댓글이 없어 영상만 분석합니다');
+      if(y.note&&found.length) infoMsg+=' ('+y.note+')';
+    } else if(!desc&&hasServer){
       try{
         const ctrl=new AbortController();
         setTimeout(()=>ctrl.abort(),15000);
@@ -1046,11 +1094,10 @@ function renderImportStep1(){
         console.warn('[서버] 연결 실패:', e.message);
       }
     } else if(!desc){
-      infoMsg=shorts
-        ?'댓글은 자동으로 못 읽어요. 레시피가 댓글에 있으면 붙여넣고 다시 시도하세요'
-        :'설명·댓글은 자동으로 못 읽어 영상만 분석합니다';
+      infoMsg='설정에서 YouTube 키를 넣으면 댓글도 읽어요. 지금은 영상만 분석합니다';
     }
     const meta=await metaP;
+    if(ytChannel&&meta) meta.author=ytChannel;
     currentSourceUrl=url;
     await runParse(()=>parseFromVideo(vid,desc,shorts,meta), infoMsg);
   };
@@ -1291,6 +1338,13 @@ function renderSettings(){
     +'</div>'
 
     +'<div class="set-block">'
+    +'<div class="set-title">YouTube API 키 (댓글 읽기)</div>'
+    +'<div class="help">설명란과 크리에이터 댓글을 자동으로 가져옵니다. 쇼츠는 레시피가 댓글에 있는 경우가 많습니다. 선택 사항입니다.</div>'
+    +'<input id="yt-key-input" type="password" placeholder="AIza…" value="'+esc(localStorage.getItem('yt-key')||'')+'" aria-label="YouTube API 키" style="margin-top:10px">'
+    +'<button class="btn btn-ghost" id="btn-save-ytkey" style="margin-top:8px">저장</button>'
+    +'</div>'
+
+    +'<div class="set-block">'
     +'<div class="set-title">데이터 백업</div>'
     +'<button class="btn btn-ghost" id="btn-export">JSON 내보내기</button>'
     +'<label class="btn btn-ghost">JSON 가져오기<input type="file" id="file-import" accept=".json" style="display:none"></label>'
@@ -1318,6 +1372,12 @@ function renderSettings(){
   document.getElementById('btn-save-key').onclick=()=>{
     const k=document.getElementById('key-input').value.trim();
     if(k) localStorage.setItem('gemini-key',k); else localStorage.removeItem('gemini-key');
+    toast('저장했습니다');
+  };
+
+  document.getElementById('btn-save-ytkey').onclick=()=>{
+    const k=document.getElementById('yt-key-input').value.trim();
+    if(k) localStorage.setItem('yt-key',k); else localStorage.removeItem('yt-key');
     toast('저장했습니다');
   };
 
