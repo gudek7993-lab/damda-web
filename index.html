@@ -302,7 +302,7 @@ details[open] summary .i{transform:rotate(90deg)}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><span class="ver">Damda v14</span></div>
+  <div class="hd"><h1>설정</h1><span class="ver">Damda v15</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -1653,7 +1653,19 @@ document.getElementById('search-input').oninput=e=>{
   renderList();
 };
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+// 새 버전이 설치되면 자동으로 새로고침 (첫 설치는 제외, 조리·입력 중이면 건드리지 않음)
+if('serviceWorker' in navigator){
+  const hadController=!!navigator.serviceWorker.controller;
+  let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(!hadController||reloaded||document.querySelector('.overlay.on')) return;
+    reloaded=true; location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    // 앱이 백그라운드에서 돌아올 때마다 업데이트 확인
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) reg.update().catch(()=>{}); });
+  }).catch(()=>{});
+}
 
 renderList();
 
