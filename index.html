@@ -64,6 +64,20 @@ input[type=search]::-webkit-search-cancel-button{filter:grayscale(1) brightness(
 .search{position:relative;margin:12px 16px 2px}
 .search .i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--fa);pointer-events:none;width:20px;height:20px}
 .search input{padding-left:42px}
+.season{padding:14px 16px 2px}
+.season-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.season-hd b{font-size:17px;font-weight:700}
+.season-hd small{color:var(--fa);font-size:12px}
+.chip-grp{flex:none;align-self:center;font-size:12px;font-weight:600;color:var(--fa);padding:0 2px 0 8px}
+.chip-grp:first-child{padding-left:0}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:none;color:var(--fa);font-size:14px;font-weight:500;cursor:pointer;transition:transform .15s var(--ease)}
+.chip:active{transform:scale(.97)}
+.chip.has{background:var(--ac-soft);border-color:transparent;color:var(--ac);font-weight:600}
+.chip.on{background:var(--ac);border-color:transparent;color:var(--ac-tx)}
+.chip i{font-style:normal;font-size:12px;margin-left:6px;opacity:.85;font-variant-numeric:tabular-nums}
+.season-tag{font-size:11px;font-weight:600;color:var(--c-linear);margin-left:6px}
 .pills{display:flex;gap:8px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none}
 .pills::-webkit-scrollbar{display:none}
 .pill{flex:none;min-height:40px;padding:0 16px;border-radius:999px;background:var(--sf);color:var(--fa);font-size:14px;font-weight:500;cursor:pointer;border:none}
@@ -264,6 +278,7 @@ details[open] summary .i{transform:rotate(90deg)}
     <svg class="i" aria-hidden="true"><use href="#i-magnifying-glass"/></svg>
     <input id="search-input" type="search" placeholder="요리 이름이나 재료로 검색" aria-label="레시피 검색">
   </div>
+  <div class="season" id="season"></div>
   <div class="pills" id="filter-pills"></div>
   <div id="recipe-grid" class="card-grid"></div>
   <div id="list-empty" class="empty-state" style="display:none"></div>
@@ -701,9 +716,43 @@ let allRecipes=[];
 let activeFilter='전체';
 let searchQuery='';
 
+// 제철 재료 (대략적인 시기, 지역·해마다 다름). ?month=7 로 다른 달 미리보기
+const SEASON={
+ 1:{채소:'시금치 배추 무 연근 우엉',과일:'귤 한라봉 딸기',수산물:'굴 대구 매생이 꼬막 과메기',기타:'표고버섯'},
+ 2:{채소:'봄동 시금치 달래 냉이 배추',과일:'한라봉 딸기 레드향',수산물:'굴 꼬막 대구 도다리 매생이',기타:'표고버섯'},
+ 3:{채소:'냉이 달래 쑥 봄동 미나리',과일:'딸기 한라봉',수산물:'도다리 주꾸미 바지락 키조개 꼬막',기타:'표고버섯'},
+ 4:{채소:'두릅 쑥 미나리 양배추 완두콩',과일:'딸기 참외',수산물:'주꾸미 바지락 도다리 멍게 조기',기타:'표고버섯'},
+ 5:{채소:'양파 마늘 죽순 아스파라거스 취나물',과일:'딸기 참외 체리',수산물:'멍게 조기 갑오징어 전복',기타:'새송이버섯'},
+ 6:{채소:'감자 애호박 오이 상추 열무 마늘',과일:'매실 살구 자두 참외',수산물:'갑오징어 전복 병어 장어 멸치',기타:'새송이버섯'},
+ 7:{채소:'옥수수 오이 가지 토마토 깻잎 열무',과일:'수박 복숭아 자두 블루베리',수산물:'민어 장어 전복 농어 한치',기타:'새송이버섯'},
+ 8:{채소:'옥수수 가지 고추 토마토 깻잎 부추',과일:'복숭아 포도 수박 무화과',수산물:'전복 장어 갈치 농어 새우',기타:'느타리버섯'},
+ 9:{채소:'고구마 토란 도라지 더덕 늙은호박',과일:'배 사과 포도 대추 무화과',수산물:'전어 꽃게 대하 갈치 고등어',기타:'송이버섯 밤'},
+ 10:{채소:'고구마 무 배추 연근 우엉 들깨',과일:'사과 배 감 대추 석류',수산물:'전어 꽃게 갈치 고등어 낙지',기타:'밤 표고버섯'},
+ 11:{채소:'배추 무 시금치 고구마 연근 늙은호박 갓',과일:'사과 배 감 귤 유자',수산물:'굴 꽃게 방어 과메기 꼬막 대구',기타:'밤 표고버섯'},
+ 12:{채소:'배추 무 시금치 우엉 연근 브로콜리',과일:'귤 한라봉 유자 딸기',수산물:'굴 방어 대구 매생이 꼬막 과메기',기타:'표고버섯'}
+};
+const seasonMonth=()=>+new URLSearchParams(location.search).get('month')||new Date().getMonth()+1;
+const seasonItems=()=>Object.entries(SEASON[seasonMonth()]).flatMap(([k,v])=>v.split(' ').map(n=>({k,n})));
+// ponytail: 이름 포함 매칭. 한 글자(배, 감, 무)는 완전 일치만 (배추, 감자 오탐 방지). 정확한 분류는 필요해지면
+const nameHas=(name,item)=>!!name&&(item.length===1?name.trim()===item:name.includes(item));
+const inSeason=name=>seasonItems().some(s=>nameHas(name,s.n));
+let seasonPick='';
+function renderSeason(){
+  const el=document.getElementById('season');
+  let last='';
+  const chips=seasonItems().map(s=>{
+    const c=allRecipes.filter(r=>r.ings?.some(i=>nameHas(i.n,s.n))).length;
+    const grp=s.k!==last?'<span class="chip-grp">'+s.k+'</span>':''; last=s.k;
+    return grp+'<button class="chip'+(c?' has':'')+(seasonPick===s.n?' on':'')+'" data-n="'+esc(s.n)+'">'+esc(s.n)+(c?'<i>'+c+'</i>':'')+'</button>';
+  }).join('');
+  el.innerHTML='<div class="season-hd"><b>'+seasonMonth()+'월 제철 재료</b><small>대략적인 시기예요</small></div><div class="chips">'+chips+'</div>';
+  el.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{ seasonPick=seasonPick===b.dataset.n?'':b.dataset.n; renderList(); });
+}
+
 async function renderList(){
   allRecipes=await dbAll();
   allRecipes.sort((a,b)=>(!!b.fav-!!a.fav)||((b.savedAt||0)-(a.savedAt||0)));
+  renderSeason();
 
   // filter pills
   const cuisines=['전체',...(allRecipes.some(r=>r.fav)?['즐겨찾기']:[]),...new Set(allRecipes.map(r=>r.cuisine).filter(Boolean))];
@@ -723,6 +772,7 @@ async function renderList(){
   const shown=allRecipes.filter(r=>{
     if(activeFilter==='즐겨찾기'){ if(!r.fav) return false; }
     else if(activeFilter!=='전체'&&r.cuisine!==activeFilter) return false;
+    if(seasonPick&&!r.ings?.some(i=>nameHas(i.n,seasonPick))) return false;
     if(q){
       const inTitle=r.title?.toLowerCase().includes(q);
       const inIngs=r.ings?.some(i=>i.n?.toLowerCase().includes(q));
@@ -881,7 +931,7 @@ function ingGroupsHTML(ings,ctx){
     html+='<div class="ing-group"><div class="ing-gh c-'+cls+'"><span>'+CLS_LABEL[cls]+'</span>'
       +'<span class="ing-mult" data-cls="'+cls+'"></span></div>';
     items.forEach(({ing,i})=>{
-      html+='<div class="ing-row"><span>'+esc(ing.n)+(ing.e?'<span class="est-tag">추정</span>':'')+'</span><span class="amt" data-i="'+i+'">'+ctx.fmt(ing)+'</span></div>';
+      html+='<div class="ing-row"><span>'+esc(ing.n)+(inSeason(ing.n)?'<span class="season-tag">제철</span>':'')+(ing.e?'<span class="est-tag">추정</span>':'')+'</span><span class="amt" data-i="'+i+'">'+ctx.fmt(ing)+'</span></div>';
     });
     html+='</div>';
   });
