@@ -302,7 +302,7 @@ details[open] summary .i{transform:rotate(90deg)}
 
 <!-- SETTINGS SCREEN -->
 <div id="s-settings" class="screen">
-  <div class="hd"><h1>설정</h1><span class="ver">Damda v13</span></div>
+  <div class="hd"><h1>설정</h1><span class="ver">Damda v14</span></div>
   <div id="settings-body"></div>
 </div>
 
@@ -761,8 +761,10 @@ function seasonRange(name){
   }
   return out.join(', ');
 }
+// 가공품(사과 식초, 굴소스, 유자청, 새우젓, 배추김치, 말린 표고버섯 등)은 생재료가 아니므로 제철로 보지 않음
+const PROCESSED=/식초|주스|즙|잼|소스|가루|분말|오일|기름|액젓|젓$|젓갈|장아찌|절임|통조림|말랭이|시럽|효소|엑기스|농축|케첩|페이스트|퓨레|드레싱|와인|맛술|고추장|된장|간장|쌈장|김치|조림|건조|말린|마른|냉동|[가-힣]청$|[가-힣]차$/;
 // ponytail: 이름 포함 매칭. 한 글자(배, 감, 무)는 완전 일치만 (배추, 감자 오탐 방지). 정확한 분류는 필요해지면
-const nameHas=(name,item)=>!!name&&(item.length===1?name.trim()===item:name.includes(item));
+const nameHas=(name,item)=>!!name&&!PROCESSED.test(name)&&(item.length===1?name.trim()===item:name.includes(item));
 const inSeason=name=>seasonItems().some(s=>nameHas(name,s.n));
 const seasonHits=r=>seasonItems().filter(s=>r.ings?.some(i=>nameHas(i.n,s.n))).map(s=>s.n);
 const recipesWith=n=>allRecipes.filter(r=>r.ings?.some(i=>nameHas(i.n,n)));
