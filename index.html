@@ -64,19 +64,34 @@ input[type=search]::-webkit-search-cancel-button{filter:grayscale(1) brightness(
 .search{position:relative;margin:12px 16px 2px}
 .search .i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--fa);pointer-events:none;width:20px;height:20px}
 .search input{padding-left:42px}
-.season{padding:14px 16px 2px}
-.season-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
-.season-hd b{font-size:17px;font-weight:700}
-.season-hd small{color:var(--fa);font-size:12px}
-.chip-grp{flex:none;align-self:center;font-size:12px;font-weight:600;color:var(--fa);padding:0 2px 0 8px}
-.chip-grp:first-child{padding-left:0}
-.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:none;color:var(--fa);font-size:14px;font-weight:500;cursor:pointer;transition:transform .15s var(--ease)}
+.season-line{display:flex;align-items:center;gap:10px;width:calc(100% - 32px);margin:12px 16px 0;padding:11px 14px;border-radius:var(--r-s);background:var(--sf);color:var(--tx);font-size:14px;text-align:left;border:none;cursor:pointer;transition:transform .15s var(--ease)}
+.season-line:active{transform:scale(.99)}
+.season-line .i{flex:none;color:var(--c-linear)}
+.season-line .sl-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fa)}
+.season-line .sl-txt b{color:var(--tx);font-weight:600;margin-right:6px}
+.season-line .sl-txt em{font-style:normal;color:var(--c-linear);font-weight:600}
+.season-line .i-sm{color:var(--fa)}
+.sheet .sh-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.sheet .sh-hd h3{margin:0}
+.sheet .sh-hd small{font-size:12px;color:var(--fa)}
+.sh-grp{font-size:12px;font-weight:600;color:var(--fa);margin:14px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:none;color:var(--fa);font-size:14px;font-weight:500;cursor:pointer;transition:transform .15s var(--ease)}
 .chip:active{transform:scale(.97)}
 .chip.has{background:var(--ac-soft);border-color:transparent;color:var(--ac);font-weight:600}
-.chip.on{background:var(--ac);border-color:transparent;color:var(--ac-tx)}
 .chip i{font-style:normal;font-size:12px;margin-left:6px;opacity:.85;font-variant-numeric:tabular-nums}
+.sh-note{font-size:12px;color:var(--fa);margin-top:18px;line-height:1.5}
+.sh-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--fa);font-size:14px;padding:6px 0;margin-bottom:6px;cursor:pointer}
+.sh-when{font-size:15px;color:var(--c-linear);font-weight:600;margin:-6px 0 14px}
+.sh-row{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:48px;padding:0 14px;margin-bottom:8px;border-radius:var(--r-c);background:var(--sf2);color:var(--tx);font-size:15px;font-weight:500;border:none;cursor:pointer;text-align:left}
+.sh-row span{color:var(--fa);font-size:13px}
+.sh-empty{font-size:14px;color:var(--fa);margin-bottom:14px}
+.sh-act{margin-top:8px}
+.card-season{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--c-linear);font-weight:600;margin-top:4px}
+.card-season .i{width:14px;height:14px}
+.season-sum{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--fa);margin:2px 0 12px}
+.season-sum .i{flex:none;color:var(--c-linear)}
+.season-sum b{color:var(--c-linear);font-weight:600}
 .season-tag{font-size:11px;font-weight:600;color:var(--c-linear);margin-left:6px}
 .pills{display:flex;gap:8px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none}
 .pills::-webkit-scrollbar{display:none}
@@ -265,6 +280,7 @@ details[open] summary .i{transform:rotate(90deg)}
 <symbol id="i-timer" viewBox="0 0 256 256"><path d="M128,40a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,40Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,128,216ZM173.66,90.34a8,8,0,0,1,0,11.32l-40,40a8,8,0,0,1-11.32-11.32l40-40A8,8,0,0,1,173.66,90.34ZM96,16a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,16Z"/></symbol>
 <symbol id="i-trash" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></symbol>
 <symbol id="i-warning-circle" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 256 256"><path d="M208,48S64,40,64,144c0,32,24,56,56,56,104,0,88-152,88-152Z" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"/><path d="M48,216,120,136" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></symbol>
 <symbol id="i-star" viewBox="0 0 256 256"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></symbol>
 <symbol id="i-star-fill" viewBox="0 0 256 256"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></symbol>
 <symbol id="i-x" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol>
@@ -278,7 +294,7 @@ details[open] summary .i{transform:rotate(90deg)}
     <svg class="i" aria-hidden="true"><use href="#i-magnifying-glass"/></svg>
     <input id="search-input" type="search" placeholder="요리 이름이나 재료로 검색" aria-label="레시피 검색">
   </div>
-  <div class="season" id="season"></div>
+  <button class="season-line" id="season-line" aria-haspopup="dialog"></button>
   <div class="pills" id="filter-pills"></div>
   <div id="recipe-grid" class="card-grid"></div>
   <div id="list-empty" class="empty-state" style="display:none"></div>
@@ -716,49 +732,98 @@ let allRecipes=[];
 let activeFilter='전체';
 let searchQuery='';
 
-// 제철 재료 (대략적인 시기, 지역·해마다 다름). ?month=7 로 다른 달 미리보기
+// 제철 재료: 대략적인 시기 (지역·해마다 다름). ?month=7 로 다른 달 미리보기
 const SEASON={
- 1:{채소:'시금치 배추 무 연근 우엉',과일:'귤 한라봉 딸기',수산물:'굴 대구 매생이 꼬막 과메기',기타:'표고버섯'},
- 2:{채소:'봄동 시금치 달래 냉이 배추',과일:'한라봉 딸기 레드향',수산물:'굴 꼬막 대구 도다리 매생이',기타:'표고버섯'},
- 3:{채소:'냉이 달래 쑥 봄동 미나리',과일:'딸기 한라봉',수산물:'도다리 주꾸미 바지락 키조개 꼬막',기타:'표고버섯'},
- 4:{채소:'두릅 쑥 미나리 양배추 완두콩',과일:'딸기 참외',수산물:'주꾸미 바지락 도다리 멍게 조기',기타:'표고버섯'},
- 5:{채소:'양파 마늘 죽순 아스파라거스 취나물',과일:'딸기 참외 체리',수산물:'멍게 조기 갑오징어 전복',기타:'새송이버섯'},
- 6:{채소:'감자 애호박 오이 상추 열무 마늘',과일:'매실 살구 자두 참외',수산물:'갑오징어 전복 병어 장어 멸치',기타:'새송이버섯'},
+ 1:{채소:'미나리 도라지 더덕 토란대 시금치 배추 무 연근',과일:'한라봉 귤 곶감 딸기',수산물:'굴 방어 송어 매생이 꼬막 과메기 홍합 김 대구',기타:'표고버섯'},
+ 2:{채소:'봄동 시금치 달래 냉이 배추 미나리',과일:'한라봉 딸기 레드향 천혜향',수산물:'굴 꼬막 대게 홍게 참돔 김 매생이 아귀 전복',기타:'표고버섯'},
+ 3:{채소:'냉이 달래 쑥 봄동 미나리 비트',과일:'딸기 천혜향 한라봉',수산물:'임연수어 바지락 주꾸미 도다리 꼬막 키조개',기타:'표고버섯'},
+ 4:{채소:'두릅 쑥 미나리 양배추 완두콩',과일:'딸기 참외',수산물:'바지락 주꾸미 도다리 멍게 조기',기타:'표고버섯'},
+ 5:{채소:'양파 마늘 죽순 아스파라거스 취나물',과일:'딸기 참외 체리',수산물:'청어 우럭 멍게 조기 갑오징어 전복',기타:'새송이버섯'},
+ 6:{채소:'감자 애호박 오이 상추 열무 마늘',과일:'매실 살구 자두 참외',수산물:'키조개 전갱이 갑오징어 전복 병어 장어',기타:'새송이버섯'},
  7:{채소:'옥수수 오이 가지 토마토 깻잎 열무',과일:'수박 복숭아 자두 블루베리',수산물:'민어 장어 전복 농어 한치',기타:'새송이버섯'},
- 8:{채소:'옥수수 가지 고추 토마토 깻잎 부추',과일:'복숭아 포도 수박 무화과',수산물:'전복 장어 갈치 농어 새우',기타:'느타리버섯'},
+ 8:{채소:'옥수수 가지 고추 토마토 깻잎 부추',과일:'복숭아 포도 수박 무화과',수산물:'전복 장어 갈치 농어 새우 전어',기타:'느타리버섯'},
  9:{채소:'고구마 토란 도라지 더덕 늙은호박',과일:'배 사과 포도 대추 무화과',수산물:'전어 꽃게 대하 갈치 고등어',기타:'송이버섯 밤'},
- 10:{채소:'고구마 무 배추 연근 우엉 들깨',과일:'사과 배 감 대추 석류',수산물:'전어 꽃게 갈치 고등어 낙지',기타:'밤 표고버섯'},
+ 10:{채소:'고구마 무 배추 연근 우엉 들깨',과일:'사과 배 감 대추 석류',수산물:'전어 낙지 꽃게 갈치 고등어',기타:'밤 표고버섯'},
  11:{채소:'배추 무 시금치 고구마 연근 늙은호박 갓',과일:'사과 배 감 귤 유자',수산물:'굴 꽃게 방어 과메기 꼬막 대구',기타:'밤 표고버섯'},
- 12:{채소:'배추 무 시금치 우엉 연근 브로콜리',과일:'귤 한라봉 유자 딸기',수산물:'굴 방어 대구 매생이 꼬막 과메기',기타:'표고버섯'}
+ 12:{채소:'배추 무 시금치 우엉 연근 브로콜리',과일:'귤 한라봉 유자 딸기',수산물:'과메기 복어 대게 대구 굴 매생이 꼬막',기타:'표고버섯'}
 };
 const seasonMonth=()=>+new URLSearchParams(location.search).get('month')||new Date().getMonth()+1;
 const seasonItems=()=>Object.entries(SEASON[seasonMonth()]).flatMap(([k,v])=>v.split(' ').map(n=>({k,n})));
+// 재료가 제철인 달 → "11~2월" 같은 기간 (12월→1월 이어짐 처리)
+function seasonRange(name){
+  const on=[null,...Array.from({length:12},(_,i)=>Object.values(SEASON[i+1]).some(v=>v.split(' ').includes(name)))];
+  if(on.slice(1).every(Boolean)) return '연중';
+  const out=[];
+  for(let m=1;m<=12;m++){
+    if(!on[m]||on[m===1?12:m-1]) continue;
+    let e=m; while(on[e===12?1:e+1]) e=e===12?1:e+1;
+    out.push(e===m?m+'월':m+'~'+e+'월');
+  }
+  return out.join(', ');
+}
 // ponytail: 이름 포함 매칭. 한 글자(배, 감, 무)는 완전 일치만 (배추, 감자 오탐 방지). 정확한 분류는 필요해지면
 const nameHas=(name,item)=>!!name&&(item.length===1?name.trim()===item:name.includes(item));
 const inSeason=name=>seasonItems().some(s=>nameHas(name,s.n));
+const seasonHits=r=>seasonItems().filter(s=>r.ings?.some(i=>nameHas(i.n,s.n))).map(s=>s.n);
+const recipesWith=n=>allRecipes.filter(r=>r.ings?.some(i=>nameHas(i.n,n)));
 let seasonPick='';
-function renderSeason(){
-  const el=document.getElementById('season');
-  let last='';
-  const chips=seasonItems().map(s=>{
-    const c=allRecipes.filter(r=>r.ings?.some(i=>nameHas(i.n,s.n))).length;
-    const grp=s.k!==last?'<span class="chip-grp">'+s.k+'</span>':''; last=s.k;
-    return grp+'<button class="chip'+(c?' has':'')+(seasonPick===s.n?' on':'')+'" data-n="'+esc(s.n)+'">'+esc(s.n)+(c?'<i>'+c+'</i>':'')+'</button>';
-  }).join('');
-  el.innerHTML='<div class="season-hd"><b>'+seasonMonth()+'월 제철 재료</b><small>대략적인 시기예요</small></div><div class="chips">'+chips+'</div>';
-  el.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{ seasonPick=seasonPick===b.dataset.n?'':b.dataset.n; renderList(); });
+
+// 목록 맨 위 한 줄: 내 레시피로 만들 수 있는 제철 재료를 먼저
+function renderSeasonLine(){
+  const el=document.getElementById('season-line');
+  const items=seasonItems(), mine=items.filter(s=>recipesWith(s.n).length);
+  const shownItems=mine.length?mine:items;
+  const list=shownItems.slice(0,2).map(s=>s.n).join(' · ');
+  const more=shownItems.length-2;
+  el.innerHTML=ic('leaf')+'<span class="sl-txt"><b>'+seasonMonth()+'월 제철</b>'
+    +(mine.length?'<em>내 레시피로</em> ':'')+esc(list)+(more>0?' 외 '+more:'')+'</span>'+ic('caret-right','i-sm');
+  el.onclick=seasonSheetHome;
+}
+function seasonSheetHome(){
+  const items=seasonItems();
+  let html='<div class="sh-hd"><h3>'+seasonMonth()+'월 제철 재료</h3><small>대략적인 시기예요</small></div>';
+  for(const k of ['채소','과일','수산물','기타']){
+    const g=items.filter(s=>s.k===k).map(s=>({...s,c:recipesWith(s.n).length})).sort((a,b)=>b.c-a.c);
+    if(!g.length) continue;
+    html+='<div class="sh-grp">'+k+'</div><div class="chips">'
+      +g.map(s=>'<button class="chip'+(s.c?' has':'')+'" data-n="'+esc(s.n)+'">'+esc(s.n)+(s.c?'<i>'+s.c+'</i>':'')+'</button>').join('')+'</div>';
+  }
+  html+='<div class="sh-note">지역과 해마다 조금씩 달라요. 주황색은 내 레시피에 쓰인 재료예요.</div>';
+  openSheet(html);
+  document.querySelectorAll('#sheet-body [data-n]').forEach(b=>b.onclick=()=>seasonSheetItem(b.dataset.n));
+}
+function seasonSheetItem(name){
+  const recs=recipesWith(name);
+  let html='<button class="sh-back" id="sh-back">'+ic('arrow-left','i-sm')+seasonMonth()+'월 제철 재료</button>'
+    +'<div class="sh-hd"><h3>'+esc(name)+'</h3></div><div class="sh-when">제철 '+esc(seasonRange(name))+'</div>'
+    +(recs.length
+      ? recs.map(r=>'<button class="sh-row" data-id="'+esc(r.id)+'">'+esc(r.title||'제목없음')+'<span>'+esc(r.servings||'')+'인분</span></button>').join('')
+        +'<button class="btn btn-primary sh-act" id="sh-filter">목록에서 모두 보기 ('+recs.length+')</button>'
+      : '<div class="sh-empty">저장한 레시피가 없어요</div>')
+    +'<a class="btn btn-ghost sh-act" href="https://www.youtube.com/results?search_query='+encodeURIComponent(name+' 요리')+'" target="_blank" rel="noopener">'+ic('youtube-logo','i-sm')+'YouTube에서 레시피 찾기</a>';
+  document.getElementById('sheet-body').innerHTML=html;
+  document.getElementById('sh-back').onclick=seasonSheetHome;
+  document.querySelectorAll('#sheet-body [data-id]').forEach(b=>b.onclick=()=>{ closeSheet(); openDetail(b.dataset.id); });
+  const f=document.getElementById('sh-filter');
+  if(f) f.onclick=()=>{ seasonPick=name; activeFilter='전체'; closeSheet(); renderList(); };
 }
 
 async function renderList(){
   allRecipes=await dbAll();
   allRecipes.sort((a,b)=>(!!b.fav-!!a.fav)||((b.savedAt||0)-(a.savedAt||0)));
-  renderSeason();
+  renderSeasonLine();
 
   // filter pills
-  const cuisines=['전체',...(allRecipes.some(r=>r.fav)?['즐겨찾기']:[]),...new Set(allRecipes.map(r=>r.cuisine).filter(Boolean))];
+  const cuisines=['전체',...(allRecipes.some(r=>r.fav)?['즐겨찾기']:[]),...(allRecipes.some(r=>seasonHits(r).length)?['지금 제철']:[]),...new Set(allRecipes.map(r=>r.cuisine).filter(Boolean))];
   const pillsEl=document.getElementById('filter-pills');
   pillsEl.innerHTML='';
   pillsEl.style.display=allRecipes.length?'':'none';
+  if(seasonPick){
+    const x=document.createElement('button');
+    x.className='pill on'; x.textContent='제철: '+seasonPick+' ×'; x.setAttribute('aria-label','제철 필터 해제');
+    x.onclick=()=>{ seasonPick=''; renderList(); };
+    pillsEl.appendChild(x);
+  }
   cuisines.forEach(c=>{
     const btn=document.createElement('button');
     btn.className='pill'+(c===activeFilter?' on':'');
@@ -771,6 +836,7 @@ async function renderList(){
   const q=searchQuery.toLowerCase();
   const shown=allRecipes.filter(r=>{
     if(activeFilter==='즐겨찾기'){ if(!r.fav) return false; }
+    else if(activeFilter==='지금 제철'){ if(!seasonHits(r).length) return false; }
     else if(activeFilter!=='전체'&&r.cuisine!==activeFilter) return false;
     if(seasonPick&&!r.ings?.some(i=>nameHas(i.n,seasonPick))) return false;
     if(q){
@@ -801,6 +867,7 @@ async function renderList(){
     card.innerHTML=ytThumb(r.sourceUrl,'thumb')+'<div class="card-title">'+esc(r.title||'제목없음')+(r.fav?ic('star-fill'):'')+'</div>'
       +(r.source?'<div class="card-src">'+(r.sourceUrl?ic('youtube-logo','i-sm'):'')+'<span>'+esc(r.source)+'</span></div>':'')
       +(matchedIng?'<div class="card-match">'+ic('magnifying-glass','i-sm')+esc(matchedIng.n)+'</div>':'')
+      +(seasonHits(r).length?'<div class="card-season">'+ic('leaf','i-sm')+'제철 '+seasonHits(r).length+'</div>':'')
       +'<div class="card-meta"><span>'+esc([r.cuisine,r.dish].filter(Boolean).join(' '))+'</span><span class="num">'+esc(r.servings||'')+'인분</span></div>';
     card.onclick=()=>openDetail(r.id);
     grid.appendChild(card);
@@ -966,7 +1033,10 @@ function renderDetail(r,baseSalt){
       +'</div>';
   }
 
-  html+='<div class="section"><div class="sec-hd"><h2>재료</h2></div>'+ingGroupsHTML(ings,ctx)+'</div>';
+  const sh=seasonHits(r);
+  html+='<div class="section"><div class="sec-hd"><h2>재료</h2></div>'
+    +(sh.length?'<div class="season-sum">'+ic('leaf')+'<span>지금 제철 재료 '+sh.length+'개 <b>'+esc(sh.join(', '))+'</b></span></div>':'')
+    +ingGroupsHTML(ings,ctx)+'</div>';
 
   html+='<div class="section"><div class="sec-hd"><h2>조리 순서</h2>'
     +(steps.length?'<button class="btn btn-primary btn-sm" id="btn-cook-start">'+ic('play','i-sm')+'조리 시작</button>':'')
